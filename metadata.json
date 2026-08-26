@@ -1,0 +1,8 @@
+{
+  "name": "LocalCrick MVP",
+  "description": "CrickHero mobile application for team creation, player invitations, live scoring, tournament tracking, and academy management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
