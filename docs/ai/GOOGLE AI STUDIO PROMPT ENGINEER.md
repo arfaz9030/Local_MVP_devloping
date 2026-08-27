@@ -286,8 +286,62 @@ Google AI Studio prompts must instruct the implementation agent to:
 
 All API integrations must comply with API & Integration Rules and Error Handling Rules defined in  the Engineering Handbook, as well as [API_CONTRACT.md](file:///c:/Users/Shaik%20Shagufa/Documents/Crick-App/LocalCrick-MVP-main/LocalCrick-MVP-main/docs/ai/API_CONTRACT.md) and relevant backend/frontend guidelines.
 
+==================================================
+14.1 DOCUMENTATION & API-CONTRACT REQUIREMENT
+==================================================
+
+After completing EACH feature or logical frontend flow:
+
+1. Review exactly what data, API operation, request fields, response fields,
+   authentication, validation, and error handling the completed UI requires.
+
+2. Do NOT invent an API.
+
+3. If the required backend API already exists:
+   - Verify it against API_CONTRACT.md.
+   - Record the frontend integration requirement if necessary.
+
+4. If the required backend API does NOT exist or is incomplete:
+   - Do NOT implement a fake API.
+   - Do NOT fabricate success, IDs, URLs, teams, players, or persistence.
+   - Clearly identify the missing API requirement.
+   - Propose the required API contract change for review.
+   - Do NOT change API_CONTRACT.md merely because a frontend feature
+     was implemented.
+   - If a backend/API requirement is missing, identify and report the
+     proposed contract change.
+   - Update API_CONTRACT.md only when the change is explicitly approved
+     according to the CrickHero engineering/documentation workflow.
+   - Never silently convert a frontend requirement into an approved API contract.
+   - Do not implement backend code unless explicitly requested.
+
+5. After each completed feature, review and update the appropriate project
+   documentation according to the Engineering Handbook:
+   - API_CONTRACT.md → API requirements/contract changes
+   - CURRENT_STATUS.md → actual implementation status
+   - MASTER_CHECKLIST.md → completion checklist
+   - ROADMAP.md → milestone/progress changes when applicable
+   - DECISIONS.md → ONLY when an actual architectural decision has been approved
+   - Other documentation → only when relevant.
+
+6. Never mark a feature as fully complete if its required backend/API
+   integration is still missing.
+
+7. Clearly distinguish:
+   - FRONTEND DEMO COMPLETE
+   - API CONTRACT REQUIRED
+   - BACKEND IMPLEMENTATION REQUIRED
+   - FULL END-TO-END FEATURE COMPLETE
+
+Before finishing the task, provide a concise documentation update report:
+- Files changed
+- API contract changes required
+- Documentation files updated
+- Backend dependencies/blockers
+- What is genuinely complete
+- What remains pending
 --------------------------------------------------
-14.1 API Prohibitions
+14.1.1 API Prohibitions
 --------------------------------------------------
 - Never invent APIs.
 - Never invent endpoints.
