@@ -149,9 +149,9 @@ Status
 - [x] Create Team Form (name, city, captain name, captain number, checkboxes)
 - [x] Create Team API Integration (POST /api/teams)
 - [x] Get Teams API Integration (GET /api/teams)
-- [x] Team Link / Native Share Sheet (Invite via Share API)
 - [ ] Edit Team UI
 - [ ] Delete Team UI
+- [ ] Team Link / Native Share Sheet
 - [ ] Add from Contacts
 - [ ] QR Code Flow
 
@@ -309,12 +309,12 @@ Complete Teams + Players Module
 
 Tasks
 
-- [x] Remove createTeam local-state fallback (API persistence safety fix)
-- [x] Team Link / native share sheet
+- [ ] Remove createTeam local-state fallback (API persistence safety fix)
 - [ ] Edit Team UI + backend integration
 - [ ] Delete Team UI + backend integration
 - [ ] Edit Player UI + backend integration
 - [ ] Delete Player UI + backend integration
+- [ ] Team Link / native share sheet
 - [ ] Remove debug console.log statements
 
 ---
@@ -325,7 +325,7 @@ Only ONE major task.
 
 Today's Task
 
-Teams & Players API Persistence & Share Sheet Integration
+__________________________________
 
 Status
 
@@ -345,7 +345,7 @@ None
 
 # Technical Debt
 
-- [x] Remove createTeam local-state fallback on API failure (RESOLVED - API persistence safety enforced)
+- [ ] Remove createTeam local-state fallback on API failure (High priority — violates API persistence safety)
 - [ ] Remove debug console.log statements from production code
 - [ ] Centralize design tokens
 - [ ] Remove duplicate authentication logic

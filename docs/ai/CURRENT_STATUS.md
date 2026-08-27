@@ -51,9 +51,9 @@ This document does not define:
 | Frontend | 🟢 Active |
 | Backend | 🟢 Active |
 | Authentication | ✅ Completed |
-| Teams Frontend | 🟢 Substantially In Progress |
+| Teams Frontend | 🟡 Substantially In Progress |
 | Teams Backend | 🟡 Partially Active |
-| Players Frontend | 🟢 Substantially In Progress |
+| Players Frontend | 🟡 Substantially In Progress |
 | Players Backend | 🟡 Partially Active |
 | Cricket Features | ⚪ Not Started |
 | Testing | ⚪ Not Started |
@@ -78,8 +78,6 @@ Complete Teams + Players Module (frontend and backend integration).
 - [x] Add Player API integration (`POST /api/teams/{teamId}/players`)
 - [x] API failure now correctly shows error; no longer fabricates local player on failure
 - [x] Authentication Bearer token used in all Team and Player API calls
-- [x] Team creation API persistence safety enforced (removed local-state fallback)
-- [x] Team Link / native share sheet invitation flow integrated via `Share.share` in `InvitePlayerModal` and `TeamCard`
 
 ### In Progress
 
@@ -175,9 +173,9 @@ Status: 🟡 In Progress
 | Create Team Form | ✅ Completed |
 | Create Team API Integration | ✅ Working |
 | Get Teams API Integration | ✅ Working |
-| Team Link / Native Share Sheet | ✅ Completed |
 | Edit Team UI | ☐ Pending |
 | Delete Team UI | ☐ Pending |
+| Team Link / Native Share Sheet | ☐ Pending |
 | Add from Contacts | ☐ Pending |
 | QR Code Flow | ☐ Pending |
 
@@ -376,6 +374,7 @@ No architectural blockers identified.
 
 Current
 
+- `createTeam` local-state fallback on API error in `TeamsScreen.tsx` (violates API persistence safety — High priority).
 - Debug console.log statements remaining in TeamsScreen.tsx and matchApi.tsx.
 - Duplicate authentication flow.
 - OTP UI refinement.
@@ -384,6 +383,7 @@ Current
 
 Priority
 
+- High: createTeam fallback removal
 - Low: remaining items
 
 Complete after MVP (low priority items).

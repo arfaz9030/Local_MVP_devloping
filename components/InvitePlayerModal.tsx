@@ -3,7 +3,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  Share,
   StyleSheet,
   Text,
   TextInput,
@@ -45,17 +44,6 @@ export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
   const [bowlingStyle, setBowlingStyle] = useState('Right-arm medium');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const handleShareTeamLink = async () => {
-    try {
-      await Share.share({
-        title: `Invite to ${teamName}`,
-        message: `Join ${teamName} on CrickHero!`,
-      });
-    } catch (err: any) {
-      console.error('Error sharing team link:', err);
-    }
-  };
 
   const handleAddPlayer = async () => {
     const trimmedName = playerName.trim();
@@ -120,29 +108,6 @@ export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
             </TouchableOpacity>
           </View>
           <Text style={styles.subTitle}>Adding player to {teamName}</Text>
-
-          {/* Team Link Share Button (Native Share Sheet) */}
-          <TouchableOpacity
-            style={styles.shareLinkButton}
-            onPress={handleShareTeamLink}
-            activeOpacity={0.7}
-          >
-            <View style={styles.shareLinkIconWrapper}>
-              <Icon source="share-variant" size={20} color={COLORS.brandTeal} />
-            </View>
-            <View style={styles.shareLinkTextWrapper}>
-              <Text style={styles.shareLinkTitle}>Share Team Link</Text>
-              <Text style={styles.shareLinkSubtitle}>Invite players via device share sheet</Text>
-            </View>
-            <Icon source="chevron-right" size={20} color={COLORS.textDarkSecondary} />
-          </TouchableOpacity>
-
-          {/* Divider */}
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR ADD MANUALLY</Text>
-            <View style={styles.dividerLine} />
-          </View>
 
           <ScrollView style={styles.formScroll} showsVerticalScrollIndicator={false}>
             {/* Player Name */}
@@ -277,56 +242,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.sm,
     color: COLORS.textDarkSecondary,
     marginTop: 4,
-    marginBottom: 12,
-  },
-  shareLinkButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F0FDFA',
-    borderWidth: 1,
-    borderColor: '#CCFBF1',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
-  },
-  shareLinkIconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#CCFBF1',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  shareLinkTextWrapper: {
-    flex: 1,
-  },
-  shareLinkTitle: {
-    fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.bold,
-    color: COLORS.textDark,
-  },
-  shareLinkSubtitle: {
-    fontSize: 11,
-    color: COLORS.textDarkSecondary,
-    marginTop: 2,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 8,
-    gap: 8,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.borderLight,
-  },
-  dividerText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: COLORS.textDarkSecondary,
-    letterSpacing: 0.5,
+    marginBottom: 16,
   },
   formScroll: {
     marginBottom: 16,
@@ -335,7 +251,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.sm,
     fontWeight: FONT_WEIGHT.bold,
     color: COLORS.textDark,
-    marginTop: 10,
+    marginTop: 12,
     marginBottom: 6,
   },
   input: {

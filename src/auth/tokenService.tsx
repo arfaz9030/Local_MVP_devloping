@@ -1,4 +1,10 @@
-// @ts-ignore
+// saveToken(token)
+
+// getToken()
+
+// removeToken()
+
+// isLoggedIn()
 import * as SecureStore from 'expo-secure-store';
 
 const TOKEN_KEY = 'auth_token';
@@ -30,4 +36,3 @@ export async function handleUnauthorized() {
 
   unauthorizedHandler?.();
 }
-

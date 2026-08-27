@@ -70,6 +70,30 @@ export const TeamsScreen: React.FC = () => {
       );
     } catch (e: any) {
       setError('Could not load teams from server.');
+      // If server is not responding, keep local initial demo data if empty
+      if (teams.length === 0) {
+        setTeams([
+          {
+            id: '1',
+            name: 'Hyderabad Nizampet Boys',
+            captainName: 'MohammadArfaz Shaik',
+            city: 'Hyderabad (Telangana)',
+            players: [
+              { id: 'p1', name: 'MohammadArfaz Shaik', jerseyNumber: 7, role: 'All-Rounder' },
+              { id: 'p2', name: 'Rahul Sharma', jerseyNumber: 18, role: 'Batsman' },
+            ],
+          },
+          {
+            id: '2',
+            name: 'Hyderabad Tolichowki Boys',
+            captainName: 'Ahmed Khan',
+            city: 'Hyderabad (Telangana)',
+            players: [
+              { id: 'p3', name: 'Ahmed Khan', jerseyNumber: 10, role: 'Bowler' },
+            ],
+          },
+        ]);
+      }
     } finally {
       setLoading(false);
     }
@@ -108,21 +132,37 @@ export const TeamsScreen: React.FC = () => {
         addSelf,
       };
 
-      const response = await createTeam(payload);
-      const newTeam: TeamItem = {
-        id: String(response.id),
-        name: response.name,
-        captainName: response.captainName,
-        city: response.city || trimmedCity || 'Hyderabad (Telangana)',
-        players: response.players
-          ? response.players.map((p) => ({
+      let newTeam: TeamItem;
+
+      try {
+        const response = await createTeam(payload);
+        newTeam = {
+          id: String(response.id),
+          name: response.name,
+          captainName: response.captainName,
+          city: trimmedCity || 'Hyderabad (Telangana)',
+          players: response.players
+            ? response.players.map((p) => ({
               id: String(p.id),
               name: p.name,
               jerseyNumber: p.jerseyNumber,
               role: p.role,
             }))
-          : [],
-      };
+            : [],
+        };
+      } catch (apiErr) {
+        // Safe fallback for local state updates
+        newTeam = {
+          id: String(Date.now()),
+          name: trimmedTeamName,
+          captainName: trimmedCaptainName,
+          city: trimmedCity || 'Hyderabad (Telangana)',
+          captainNumber: captainNumber.trim() || undefined,
+          players: addSelf
+            ? [{ id: 'p_self', name: trimmedCaptainName, jerseyNumber: 1, role: 'Captain' }]
+            : [],
+        };
+      }
 
       setTeams((prev) => [newTeam, ...prev]);
 
@@ -136,7 +176,7 @@ export const TeamsScreen: React.FC = () => {
       setActiveTab('your_teams');
       Alert.alert('Team Created', `${trimmedTeamName} has been added successfully!`);
     } catch (err: any) {
-      setFormError(err.message || 'Failed to create team on server.');
+      setFormError(err.message || 'Failed to create team.');
     } finally {
       setSubmitting(false);
     }
@@ -150,6 +190,7 @@ export const TeamsScreen: React.FC = () => {
 
   // Callback when a player is added
   const handlePlayerAdded = (newPlayer: any) => {
+    console.log('PLAYER RECEIVED BY TEAM SCREEN:', newPlayer);
     if (!selectedTeamForInvite) return;
 
     setTeams((prevTeams) =>
