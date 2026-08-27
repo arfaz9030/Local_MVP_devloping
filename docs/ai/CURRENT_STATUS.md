@@ -78,6 +78,7 @@ Complete Teams + Players Module (frontend and backend integration).
 - [x] Add Player API integration (`POST /api/teams/{teamId}/players`)
 - [x] API failure now correctly shows error; no longer fabricates local player on failure
 - [x] Authentication Bearer token used in all Team and Player API calls
+- [x] Team Link / native share sheet invitation flow integrated via `Share.share` in `InvitePlayerModal` and `TeamCard`
 
 ### In Progress
 
@@ -173,9 +174,9 @@ Status: 🟡 In Progress
 | Create Team Form | ✅ Completed |
 | Create Team API Integration | ✅ Working |
 | Get Teams API Integration | ✅ Working |
+| Team Link / Native Share Sheet | ✅ Completed |
 | Edit Team UI | ☐ Pending |
 | Delete Team UI | ☐ Pending |
-| Team Link / Native Share Sheet | ☐ Pending |
 | Add from Contacts | ☐ Pending |
 | QR Code Flow | ☐ Pending |
 

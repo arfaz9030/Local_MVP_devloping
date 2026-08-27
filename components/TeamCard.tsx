@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   Pressable,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -72,6 +73,17 @@ export const TeamCard: React.FC<TeamCardProps> = ({
   const initials = getInitials(team.name);
   const avatarBg = getAvatarColor(team.name);
 
+  const handleShareTeamLink = async () => {
+    try {
+      await Share.share({
+        title: `Invite to ${team.name}`,
+        message: `Join our cricket team "${team.name}" on CrickHero! Captain: ${team.captainName}`,
+      });
+    } catch (err: any) {
+      console.error('Error sharing team link:', err);
+    }
+  };
+
   return (
     <View style={styles.card}>
       {/* Team Header Row */}
@@ -109,9 +121,15 @@ export const TeamCard: React.FC<TeamCardProps> = ({
           ) : null}
         </View>
 
-        {/* Right QR and Action */}
+        {/* Right Actions */}
         <View style={styles.rightActions}>
-          <Icon source="qrcode" size={24} color={COLORS.brandTeal} />
+          <TouchableOpacity
+            style={styles.actionIconButton}
+            onPress={handleShareTeamLink}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Icon source="share-variant" size={20} color={COLORS.brandTeal} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.expandButton}
             onPress={() => setExpanded(!expanded)}
@@ -268,6 +286,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     marginLeft: 8,
+  },
+  actionIconButton: {
+    padding: 4,
   },
   expandButton: {
     padding: 2,

@@ -149,9 +149,9 @@ Status
 - [x] Create Team Form (name, city, captain name, captain number, checkboxes)
 - [x] Create Team API Integration (POST /api/teams)
 - [x] Get Teams API Integration (GET /api/teams)
+- [x] Team Link / Native Share Sheet (Invite via Share API)
 - [ ] Edit Team UI
 - [ ] Delete Team UI
-- [ ] Team Link / Native Share Sheet
 - [ ] Add from Contacts
 - [ ] QR Code Flow
 
@@ -314,7 +314,7 @@ Tasks
 - [ ] Delete Team UI + backend integration
 - [ ] Edit Player UI + backend integration
 - [ ] Delete Player UI + backend integration
-- [ ] Team Link / native share sheet
+- [x] Team Link / native share sheet
 - [ ] Remove debug console.log statements
 
 ---
@@ -325,13 +325,9 @@ Only ONE major task.
 
 Today's Task
 
-__________________________________
+Team Link / Native Share Sheet
 
 Status
-
-⬜ Not Started
-
-🟨 In Progress
 
 ✅ Completed
 
