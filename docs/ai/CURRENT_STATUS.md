@@ -83,6 +83,7 @@ Complete Teams + Players Module (frontend and backend integration).
 - [x] Add from Contacts picker integration (`expo-contacts`) in `InvitePlayerModal`
 - [x] Team Selection for Match (`TeamPickerModal.tsx`) allowing Team A / Team B selection with conflict prevention
 - [x] Minimal App Drawer (`AppDrawer.tsx`) with user profile, navigation to Matches, Teams, Academy, Start Match, and Logout
+- [x] Android System Bar & Safe Area Insets Layout Fix: Wrapped root with `SafeAreaProvider`, handled top inset for red header with `light-content` status bar, and accommodated Android system navigation bar in bottom tabs layout
 
 ### In Progress
 

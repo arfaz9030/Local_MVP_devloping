@@ -1,7 +1,9 @@
 import { getToken, registerUnauthorizedHandler, removeToken } from '@/src/auth/tokenService';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { StatusBar } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -75,52 +77,55 @@ export default function RootLayout() {
   }, []);
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      <PaperProvider>
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: '#0B1220',
-            },
-            headerTintColor: '#FFFFFF',
-            headerTitleStyle: {
-              fontWeight: '700',
-            },
-            contentStyle: {
-              backgroundColor: '#0B1220',
-            },
-          }}
-        >
-          <Stack.Screen
-            name="onboarding"
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
+      <SafeAreaProvider>
+        <PaperProvider>
+          <StatusBar barStyle="light-content" translucent />
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: '#0B1220',
+              },
+              headerTintColor: '#FFFFFF',
+              headerTitleStyle: {
+                fontWeight: '700',
+              },
+              contentStyle: {
+                backgroundColor: '#0B1220',
+              },
             }}
-          />
+          >
+            <Stack.Screen
+              name="onboarding"
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+              }}
+            />
 
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+              }}
+            />
 
-          <Stack.Screen
-            name="create-match"
-            options={{
-              title: 'Create Match',
-            }}
-          />
+            <Stack.Screen
+              name="create-match"
+              options={{
+                title: 'Create Match',
+              }}
+            />
 
-          <Stack.Screen
-            name="match/[matchId]"
-            options={{
-              title: 'Match Detail',
-            }}
-          />
-        </Stack>
-      </PaperProvider>
+            <Stack.Screen
+              name="match/[matchId]"
+              options={{
+                title: 'Match Detail',
+              }}
+            />
+          </Stack>
+        </PaperProvider>
+      </SafeAreaProvider>
     </AuthContext.Provider>
   );
 }

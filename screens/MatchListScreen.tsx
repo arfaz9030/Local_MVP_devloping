@@ -206,17 +206,18 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { Icon } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppDrawer } from '../components/AppDrawer';
 import { fetchMatches, Match } from '../src/api/matchApi';
 
 export default function MatchListScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
 
   const [matches, setMatches] = useState<Match[]>([]);
@@ -290,17 +291,17 @@ export default function MatchListScreen() {
 
   if (error) {
     return (
-      <SafeAreaView style={[styles.container, styles.centerContent]}>
+      <View style={[styles.container, styles.centerContent, { paddingTop: insets.top }]}>
         <Text style={styles.errorText}>{error}</Text>
         <Pressable style={styles.retryButton} onPress={loadMatches}>
           <Text style={styles.retryButtonText}>Retry</Text>
         </Pressable>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) + 6 }]}>
       <View style={styles.headerBlock}>
         <View style={styles.headerTopRow}>
           <TouchableOpacity
@@ -343,7 +344,7 @@ export default function MatchListScreen() {
         onClose={() => setDrawerVisible(false)}
         activeItem="matches"
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
