@@ -13,8 +13,10 @@ import {
   View,
 } from 'react-native';
 import { Icon } from 'react-native-paper';
+import { AppDrawer } from '../components/AppDrawer';
 import { InvitePlayerModal } from '../components/InvitePlayerModal';
 import { TeamCard, TeamItem } from '../components/TeamCard';
+import { TeamQRModal } from '../components/TeamQRModal';
 import { createTeam, CreateTeamPayload, getTeams } from '../src/api/matchApi';
 import { COLORS } from '../src/theme/color';
 import { FONT_SIZE, FONT_WEIGHT } from '../src/theme/typography';
@@ -25,6 +27,7 @@ export const TeamsScreen: React.FC = () => {
   // Navigation & Tabs
   const [activeTab, setActiveTab] = useState<TabType>('your_teams');
   const [searchQuery, setSearchQuery] = useState('');
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   // Teams Data State
   const [teams, setTeams] = useState<TeamItem[]>([]);
@@ -44,6 +47,10 @@ export const TeamsScreen: React.FC = () => {
   // Invite Player Modal State
   const [inviteModalVisible, setInviteModalVisible] = useState(false);
   const [selectedTeamForInvite, setSelectedTeamForInvite] = useState<TeamItem | null>(null);
+
+  // QR Modal State
+  const [qrModalVisible, setQrModalVisible] = useState(false);
+  const [qrModalTeam, setQrModalTeam] = useState<TeamItem | null>(null);
 
   // Load teams on mount
   const loadTeams = async () => {
@@ -219,20 +226,47 @@ export const TeamsScreen: React.FC = () => {
       {/* Red Top Header */}
       <View style={styles.topHeader}>
         <View style={styles.headerLeft}>
-          <TouchableOpacity style={styles.iconBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-            <Icon source="arrow-left" size={24} color={COLORS.surfaceWhite} />
-          </TouchableOpacity>
+          {activeTab === 'add' ? (
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => setActiveTab('your_teams')}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon source="arrow-left" size={24} color={COLORS.surfaceWhite} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => setDrawerVisible(true)}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon source="menu" size={24} color={COLORS.surfaceWhite} />
+            </TouchableOpacity>
+          )}
           <Text style={styles.headerTitle}>
             {activeTab === 'add' ? 'Create your team' : 'Teams'}
           </Text>
         </View>
 
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.iconBtn}>
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={() => {
+              if (teams.length > 0) {
+                setQrModalTeam(teams[0]);
+              } else {
+                setQrModalTeam({
+                  id: '1',
+                  name: 'Hyderabad Nizampet Boys',
+                  captainName: 'MohammadArfaz Shaik',
+                  city: 'Hyderabad (Telangana)',
+                  players: [],
+                });
+              }
+              setQrModalVisible(true);
+            }}
+          >
             <Icon source="qrcode-scan" size={22} color={COLORS.surfaceWhite} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}>
-            <Icon source="magnify" size={24} color={COLORS.surfaceWhite} />
           </TouchableOpacity>
         </View>
       </View>
@@ -317,6 +351,10 @@ export const TeamsScreen: React.FC = () => {
                   <TeamCard
                     team={item}
                     onInvitePlayer={handleOpenInvite}
+                    onShowQR={(team) => {
+                      setQrModalTeam(team);
+                      setQrModalVisible(true);
+                    }}
                   />
                 )}
                 ListEmptyComponent={
@@ -530,6 +568,24 @@ export const TeamsScreen: React.FC = () => {
           onPlayerAdded={handlePlayerAdded}
         />
       ) : null}
+
+      {/* Team QR Modal */}
+      {qrModalTeam ? (
+        <TeamQRModal
+          visible={qrModalVisible}
+          teamId={qrModalTeam.id}
+          teamName={qrModalTeam.name}
+          captainName={qrModalTeam.captainName}
+          onClose={() => setQrModalVisible(false)}
+        />
+      ) : null}
+
+      {/* App Drawer Navigation */}
+      <AppDrawer
+        visible={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        activeItem="teams"
+      />
     </SafeAreaView>
   );
 };

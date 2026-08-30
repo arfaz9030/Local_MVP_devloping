@@ -150,10 +150,10 @@ Status
 - [x] Create Team API Integration (POST /api/teams)
 - [x] Get Teams API Integration (GET /api/teams)
 - [x] Team Link / Native Share Sheet (Invite via Share API)
+- [x] Add from Contacts (Native contact picker integration via expo-contacts)
+- [x] QR Code Flow (TeamQRModal popup, QR share, scanner trigger)
 - [ ] Edit Team UI
 - [ ] Delete Team UI
-- [ ] Add from Contacts
-- [ ] QR Code Flow
 
 ## Backend
 
@@ -165,7 +165,7 @@ Status
 
 Status
 
-🟡 In Progress
+🟡 Substantially In Progress (Core UI, QR, Contacts, Share Complete)
 
 ---
 
@@ -177,6 +177,7 @@ Status
 - [x] Add Player API Integration (POST /api/teams/{teamId}/players)
 - [x] Player list display inside TeamCard
 - [x] API failure correctly shows error (no longer fabricates local state)
+- [x] Quick actions: Share team link & pick contact from phonebook
 - [ ] Edit Player UI
 - [ ] Delete / Remove Player UI
 - [ ] Player Profile
@@ -190,21 +191,22 @@ Status
 
 Status
 
-🟡 In Progress
+🟡 Substantially In Progress
 
 ---
 
 # Phase 5 — Match Creation
 
-- [ ] Create Match
-- [ ] Select Teams
+- [x] Create Match Screen UI & Setup Flow
+- [x] Select Teams (Team A & Team B selection from existing teams via TeamPickerModal)
+- [x] Match Settings (Overs, Ball Type, Match Type selection chips)
 - [ ] Toss
 - [ ] Playing XI
-- [ ] Match Settings
+- [ ] Match backend integration
 
 Status
 
-⬜ Not Started
+🟡 Frontend Demo Complete (Select Team A/B + Settings)
 
 ---
 

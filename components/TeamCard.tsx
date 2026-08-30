@@ -33,6 +33,7 @@ interface TeamCardProps {
   team: TeamItem;
   onInvitePlayer: (team: TeamItem) => void;
   onSelectTeam?: (team: TeamItem) => void;
+  onShowQR?: (team: TeamItem) => void;
 }
 
 // Generate consistent avatar color based on team name
@@ -68,6 +69,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({
   team,
   onInvitePlayer,
   onSelectTeam,
+  onShowQR,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const initials = getInitials(team.name);
@@ -77,7 +79,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({
     try {
       await Share.share({
         title: `Invite to ${team.name}`,
-        message: `Join our cricket team "${team.name}" on CrickHero! Captain: ${team.captainName}`,
+        message: `Join our cricket team "${team.name}" on CrickHero! Captain: ${team.captainName} (Team invitation demo share)`,
       });
     } catch (err: any) {
       console.error('Error sharing team link:', err);
@@ -125,10 +127,17 @@ export const TeamCard: React.FC<TeamCardProps> = ({
         <View style={styles.rightActions}>
           <TouchableOpacity
             style={styles.actionIconButton}
+            onPress={() => onShowQR?.(team)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Icon source="qrcode" size={20} color={COLORS.textDarkSecondary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionIconButton}
             onPress={handleShareTeamLink}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Icon source="share-variant" size={20} color={COLORS.brandTeal} />
+            <Icon source="share-variant" size={19} color={COLORS.brandTeal} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.expandButton}

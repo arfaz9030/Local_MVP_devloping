@@ -209,8 +209,11 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import { Icon } from 'react-native-paper';
+import { AppDrawer } from '../components/AppDrawer';
 import { fetchMatches, Match } from '../src/api/matchApi';
 
 export default function MatchListScreen() {
@@ -219,6 +222,7 @@ export default function MatchListScreen() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const loadMatches = useCallback(async () => {
     try {
@@ -298,8 +302,19 @@ export default function MatchListScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerBlock}>
-        <Text style={styles.header}>CrickHero MVP</Text>
-        <Text style={styles.subHeader}>Live & recent matches</Text>
+        <View style={styles.headerTopRow}>
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => setDrawerVisible(true)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Icon source="menu" size={26} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View style={styles.headerTextGroup}>
+            <Text style={styles.header}>CrickHero MVP</Text>
+            <Text style={styles.subHeader}>Live & recent matches</Text>
+          </View>
+        </View>
       </View>
 
       <Pressable
@@ -322,6 +337,12 @@ export default function MatchListScreen() {
           </View>
         }
       />
+
+      <AppDrawer
+        visible={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        activeItem="matches"
+      />
     </SafeAreaView>
   );
 }
@@ -340,9 +361,22 @@ const styles = StyleSheet.create({
     marginTop: 18,
     marginBottom: 18,
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  menuButton: {
+    padding: 6,
+    borderRadius: 10,
+    backgroundColor: '#162344',
+  },
+  headerTextGroup: {
+    flex: 1,
+  },
   header: {
     color: '#FFFFFF',
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '800',
   },
   subHeader: {

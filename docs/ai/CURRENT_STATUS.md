@@ -70,7 +70,7 @@ Complete Teams + Players Module (frontend and backend integration).
 
 - [x] Teams screen UI (three-tab layout: Your Teams, Opponents, Add)
 - [x] Team list with search and empty state
-- [x] TeamCard component (expandable, avatar initials, player list preview)
+- [x] TeamCard component (expandable, avatar initials, player list preview, QR code launcher)
 - [x] Create Team form (team name, city, captain name, captain number, checkboxes)
 - [x] Team creation API integration (`POST /api/teams`)
 - [x] Teams list API integration (`GET /api/teams`)
@@ -79,6 +79,10 @@ Complete Teams + Players Module (frontend and backend integration).
 - [x] API failure now correctly shows error; no longer fabricates local player on failure
 - [x] Authentication Bearer token used in all Team and Player API calls
 - [x] Team Link / native share sheet invitation flow integrated via `Share.share` in `InvitePlayerModal` and `TeamCard`
+- [x] QR Code Modal component (`TeamQRModal.tsx`) integrated with team card QR button and top header trigger
+- [x] Add from Contacts picker integration (`expo-contacts`) in `InvitePlayerModal`
+- [x] Team Selection for Match (`TeamPickerModal.tsx`) allowing Team A / Team B selection with conflict prevention
+- [x] Minimal App Drawer (`AppDrawer.tsx`) with user profile, navigation to Matches, Teams, Academy, Start Match, and Logout
 
 ### In Progress
 
@@ -175,10 +179,10 @@ Status: 🟡 In Progress
 | Create Team API Integration | ✅ Working |
 | Get Teams API Integration | ✅ Working |
 | Team Link / Native Share Sheet | ✅ Completed |
+| Add from Contacts | ✅ Completed (expo-contacts picker) |
+| QR Code Flow | ✅ Completed (TeamQRModal + scan action) |
 | Edit Team UI | ☐ Pending |
 | Delete Team UI | ☐ Pending |
-| Add from Contacts | ☐ Pending |
-| QR Code Flow | ☐ Pending |
 
 ## Backend
 
@@ -203,6 +207,7 @@ Status: 🟡 In Progress
 | InvitePlayerModal (Add Player form) | ✅ Completed |
 | Add Player API Integration | ✅ Working |
 | Player list display inside TeamCard | ✅ Completed |
+| Quick Share & Pick from Contacts | ✅ Completed |
 | Edit Player UI | ☐ Pending |
 | Delete/Remove Player UI | ☐ Pending |
 | Player Statistics | ☐ Pending |
@@ -220,15 +225,16 @@ Status: 🟡 In Progress
 
 # Match Module
 
-Status: ⏳ Pending
+Status: 🟡 Frontend Demo Complete
 
 Features
 
-- ☐ Create Match
-- ☐ Select Teams
+- ☑ Create Match Screen
+- ☑ Select Teams (Team A & Team B with conflict prevention)
+- ☑ Match Settings (Overs, Ball Type, Match Type)
 - ☐ Toss
 - ☐ Playing XI
-- ☐ Match Settings
+- ☐ Match Backend Integration
 
 ---
 
