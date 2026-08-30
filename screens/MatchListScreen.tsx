@@ -205,7 +205,9 @@ import React, { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   Pressable,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -218,6 +220,8 @@ import { fetchMatches, Match } from '../src/api/matchApi';
 
 export default function MatchListScreen() {
   const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0;
+  const topInset = Math.max(insets.top, statusBarHeight);
   const router = useRouter();
 
   const [matches, setMatches] = useState<Match[]>([]);
@@ -301,7 +305,7 @@ export default function MatchListScreen() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) + 6 }]}>
+    <View style={[styles.container, { paddingTop: topInset + 10 }]}>
       <View style={styles.headerBlock}>
         <View style={styles.headerTopRow}>
           <TouchableOpacity

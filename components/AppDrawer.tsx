@@ -1,7 +1,9 @@
 import React from 'react';
 import {
   Modal,
+  Platform,
   Pressable,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,6 +11,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Icon } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../app/_layout';
 import { COLORS } from '../src/theme/color';
 import { FONT_SIZE, FONT_WEIGHT } from '../src/theme/typography';
@@ -24,6 +27,10 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
   onClose,
   activeItem = 'matches',
 }) => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0;
+  const topInset = Math.max(insets.top, statusBarHeight);
+  const bottomInset = insets.bottom;
   const router = useRouter();
   const { logout } = useAuth();
 
@@ -53,7 +60,15 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
         <Pressable style={styles.backdrop} onPress={onClose} />
 
         {/* Drawer Slide-in Container */}
-        <View style={styles.drawerContent}>
+        <View
+          style={[
+            styles.drawerContent,
+            {
+              paddingTop: topInset + 16,
+              paddingBottom: Math.max(bottomInset, 16),
+            },
+          ]}
+        >
           {/* User Profile Header */}
           <View style={styles.profileHeader}>
             <View style={styles.avatar}>
@@ -195,8 +210,6 @@ const styles = StyleSheet.create({
     maxWidth: 320,
     backgroundColor: COLORS.surfaceWhite,
     height: '100%',
-    paddingTop: 48,
-    paddingBottom: 24,
     paddingHorizontal: 20,
     justifyContent: 'space-between',
     shadowColor: '#000',

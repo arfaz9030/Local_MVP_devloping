@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Platform,
   Pressable,
   ScrollView,
   StatusBar,
@@ -26,6 +27,8 @@ type TabType = 'your_teams' | 'opponents' | 'add';
 
 export const TeamsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0;
+  const topInset = Math.max(insets.top, statusBarHeight);
 
   // Navigation & Tabs
   const [activeTab, setActiveTab] = useState<TabType>('your_teams');
@@ -228,7 +231,7 @@ export const TeamsScreen: React.FC = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.brandRed} translucent />
       {/* Red Top Header */}
-      <View style={[styles.topHeader, { paddingTop: Math.max(insets.top, 12) + 6 }]}>
+      <View style={[styles.topHeader, { paddingTop: topInset + 10 }]}>
         <View style={styles.headerLeft}>
           {activeTab === 'add' ? (
             <TouchableOpacity
