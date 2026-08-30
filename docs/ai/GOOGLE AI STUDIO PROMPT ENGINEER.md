@@ -139,9 +139,9 @@ Before generating an implementation prompt, verify that the required implementat
 A verification or clarification prompt may be generated before those conditions are satisfied only when its purpose is to obtain the missing information or verify the workspace.
 Actual implementation must not begin until the required implementation-gate conditions are satisfied.
 1. **Workspace Verification Status**: The local workspace project context has been verified according to the Workspace access rules defined by the Engineering Handbook.
-2. **Contract and Guidelines Presence**: The relevant files ([API_CONTRACT.md](file:///c:/Users/Shaik%20Shagufa/Documents/Crick-App/LocalCrick-MVP-main/LocalCrick-MVP-main/docs/ai/API_CONTRACT.md), [FRONTEND_GUIDELINES.md](file:///c:/Users/Shaik%20Shagufa/Documents/Crick-App/LocalCrick-MVP-main/LocalCrick-MVP-main/docs/ai/FRONTEND_GUIDELINES.md), [UI_DESIGN_SYSTEM.md]() have been read and are present.
-3. **No Unsafe Assumptions**: All API endpoints, request/response models, and parameters exist in `API_CONTRACT.md` or have been approved.
-4. **No Architectural Changes**: The task does not introduce or require architectural changes (like adding packages or altering routing structure) without explicit Tech Lead approval via [DECISIONS.md](file:///c:/Users/Shaik%20Shagufa/Documents/Crick-App/LocalCrick-MVP-main/LocalCrick-MVP-main/docs/ai/DECISIONS.md).
+2. **Contract and Guidelines Presence**: The relevant files API_CONTRACT.md, FRONTEND_GUIDELINES.md, UI_DESIGN_SYSTEM.md have been read and are present.
+3. **No Unsafe Assumptions**: All API endpoints, request/response models, and parameters exist in API_CONTRACT.md or have been approved.
+4. **No Architectural Changes**: The task does not introduce or require architectural changes (like adding packages or altering routing structure) without explicit Tech Lead approval via DECISIONS.md.
 5. **Clear Scope**: The request is within the defined MVP boundary and does not silently expand scope.
 
 If any of these conditions are not met, prompt generation must be paused and the missing information escalated.
@@ -284,7 +284,7 @@ Google AI Studio prompts must instruct the implementation agent to:
 14. API RULES AND ESCALATION
 ==================================================
 
-All API integrations must comply with API & Integration Rules and Error Handling Rules defined in  the Engineering Handbook, as well as [API_CONTRACT.md](file:///c:/Users/Shaik%20Shagufa/Documents/Crick-App/LocalCrick-MVP-main/LocalCrick-MVP-main/docs/ai/API_CONTRACT.md) and relevant backend/frontend guidelines.
+All API integrations must comply with API & Integration Rules and Error Handling Rules defined in the Engineering Handbook, as well as API_CONTRACT.md and relevant backend/frontend guidelines.
 
 ==================================================
 14.1 DOCUMENTATION & API-CONTRACT REQUIREMENT
