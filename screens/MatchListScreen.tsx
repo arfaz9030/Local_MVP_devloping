@@ -286,10 +286,10 @@ export default function MatchListScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={[styles.container, styles.centerContent]}>
+      <View style={[styles.container, styles.centerContent, { paddingTop: insets.top }]}>
         <ActivityIndicator size="large" color="#2563EB" />
         <Text style={styles.loadingText}>Loading matches...</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 

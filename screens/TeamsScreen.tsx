@@ -580,9 +580,7 @@ export const TeamsScreen: React.FC = () => {
       {qrModalTeam ? (
         <TeamQRModal
           visible={qrModalVisible}
-          teamId={qrModalTeam.id}
-          teamName={qrModalTeam.name}
-          captainName={qrModalTeam.captainName}
+          team={qrModalTeam}
           onClose={() => setQrModalVisible(false)}
         />
       ) : null}
