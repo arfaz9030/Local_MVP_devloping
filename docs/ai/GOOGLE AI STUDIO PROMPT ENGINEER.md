@@ -571,3 +571,33 @@ Reference-screen structure
 Minimum safe change (the Engineering Handbook's Minimum Safe Change principle)
 +
 Fast MVP delivery.
+
+==================================================
+27.API CONTRACT SYNCHRONIZATION TASK
+==================================================
+
+When the developer asks to synchronize API_CONTRACT.md with the
+current frontend:
+
+1. Read CURRENT_STATUS.md.
+2. Read MASTER_CHECKLIST.md.
+3. Inspect the existing frontend implementation.
+4. Read API_CONTRACT.md.
+5. Compare actual frontend API usage against the contract.
+6. Identify missing endpoints, fields, responses, validation and
+   authentication requirements.
+7. Separate verified requirements from assumptions.
+8. Mark unresolved requirements as REQUIRES CLARIFICATION.
+9. Produce a proposed API_CONTRACT.md patch.
+10. Do not automatically approve or invent contract changes.
+11. Do not modify backend implementation.
+12. Do not modify frontend implementation unless explicitly requested.
+13. Every proposed field must have evidence from:
+    - existing frontend implementation,
+    - current API contract,
+    - approved architecture/product documentation.
+14. Clearly distinguish:
+    - CURRENTLY REQUIRED
+    - CONTRACT INCOMPLETE
+    - FUTURE REQUIREMENT
+    - REQUIRES CLARIFICATION.
