@@ -18,12 +18,33 @@ const BASE_URL = 'http://192.168.29.120:2020';
 async function parseJsonResponse<T>(response: Response): Promise<T> {
   if (response.status === 401) {
     await handleUnauthorized();
-    throw new Error('Authentication expired');
+    throw new Error('Authentication expired. Please log in again.');
   }
 
   if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+    let errorDetail = '';
+    try {
+      const errorJson = await response.json();
+      errorDetail = errorJson?.message || errorJson?.error || '';
+    } catch {
+      // response body is not JSON or is empty
+    }
+
+    if (response.status === 400) {
+      throw new Error(errorDetail || 'Validation failed. Please check the entered details.');
+    } else if (response.status === 403) {
+      throw new Error(errorDetail || 'Access denied. You do not have permission to perform this action.');
+    } else if (response.status === 404) {
+      throw new Error(errorDetail || 'Requested resource was not found.');
+    } else if (response.status === 409) {
+      throw new Error(errorDetail || 'Conflict: A resource with this name already exists.');
+    } else if (response.status >= 500) {
+      throw new Error(errorDetail || 'Server error. Please try again later.');
+    } else {
+      throw new Error(errorDetail || `Request failed with status ${response.status}`);
+    }
   }
+
   return response.json();
 }
 export async function fetchMatches(): Promise<Match[]> {
@@ -127,9 +148,7 @@ export type TeamResponse = {
 
 export async function getTeams(): Promise<TeamResponse[]> {
   const token = await getToken();
-  // console.log("Token Before API:", token);
   console.log('Authentication token available:', Boolean(token));
-  // const res = await fetch(`${BASE_URL}/api/teams`);
   const res = await fetch(`${BASE_URL}/api/teams`, {
     method: "GET",
     headers: {
@@ -138,15 +157,7 @@ export async function getTeams(): Promise<TeamResponse[]> {
     },
   });
 
-  if (res.status === 401) {
-    await handleUnauthorized();
-    throw new Error('Authentication expired');
-  }
-
-  if (!res.ok) {
-    throw new Error(`Request failed: ${res.status}`);
-  }
-  return res.json();
+  return parseJsonResponse<TeamResponse[]>(res);
 }
 export interface CreateTeamPayload {
   name: string;

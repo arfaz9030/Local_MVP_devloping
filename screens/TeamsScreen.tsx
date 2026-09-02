@@ -145,41 +145,26 @@ export const TeamsScreen: React.FC = () => {
         addSelf,
       };
 
-      let newTeam: TeamItem;
-
-      try {
-        const response = await createTeam(payload);
-        newTeam = {
-          id: String(response.id),
-          name: response.name,
-          captainName: response.captainName,
-          city: trimmedCity || 'Hyderabad (Telangana)',
-          players: response.players
-            ? response.players.map((p) => ({
+      // Only proceed when the backend confirms success (2xx response)
+      const response = await createTeam(payload);
+      const newTeam: TeamItem = {
+        id: String(response.id),
+        name: response.name,
+        captainName: response.captainName,
+        city: trimmedCity || 'Hyderabad (Telangana)',
+        players: response.players
+          ? response.players.map((p) => ({
               id: String(p.id),
               name: p.name,
               jerseyNumber: p.jerseyNumber,
               role: p.role,
             }))
-            : [],
-        };
-      } catch (apiErr) {
-        // Safe fallback for local state updates
-        newTeam = {
-          id: String(Date.now()),
-          name: trimmedTeamName,
-          captainName: trimmedCaptainName,
-          city: trimmedCity || 'Hyderabad (Telangana)',
-          captainNumber: captainNumber.trim() || undefined,
-          players: addSelf
-            ? [{ id: 'p_self', name: trimmedCaptainName, jerseyNumber: 1, role: 'Captain' }]
-            : [],
-        };
-      }
+          : [],
+      };
 
       setTeams((prev) => [newTeam, ...prev]);
 
-      // Reset form
+      // Reset form on success
       setTeamName('');
       setCaptainNumber('');
       setCaptainName('');
@@ -189,7 +174,9 @@ export const TeamsScreen: React.FC = () => {
       setActiveTab('your_teams');
       Alert.alert('Team Created', `${trimmedTeamName} has been added successfully!`);
     } catch (err: any) {
-      setFormError(err.message || 'Failed to create team.');
+      const errorMsg = err?.message || 'Failed to create team. Please try again.';
+      setFormError(errorMsg);
+      Alert.alert('Unable to Create Team', errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -441,6 +428,14 @@ export const TeamsScreen: React.FC = () => {
                   </View>
                   <Text style={styles.logoLabel}>Team logo</Text>
                 </View>
+
+                {/* Inline Error Banner */}
+                {formError ? (
+                  <View style={styles.errorBannerContainer}>
+                    <Icon source="alert-circle-outline" size={18} color={COLORS.error} />
+                    <Text style={styles.errorBannerText}>{formError}</Text>
+                  </View>
+                ) : null}
 
                 {/* Team Name Input */}
                 <View style={styles.inputGroup}>
@@ -891,6 +886,26 @@ const styles = StyleSheet.create({
   },
   underlineInputError: {
     borderBottomColor: COLORS.error,
+  },
+  errorBannerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 12,
+    marginBottom: 4,
+    gap: 8,
+  },
+  errorBannerText: {
+    flex: 1,
+    fontSize: FONT_SIZE.xs,
+    color: COLORS.error,
+    fontWeight: '500',
+    lineHeight: 16,
   },
   errorTextRed: {
     fontSize: FONT_SIZE.xs,

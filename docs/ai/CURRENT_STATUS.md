@@ -84,6 +84,7 @@ Complete Teams + Players Module (frontend and backend integration).
 - [x] Team Selection for Match (`TeamPickerModal.tsx`) allowing Team A / Team B selection with conflict prevention
 - [x] Minimal App Drawer (`AppDrawer.tsx`) with user profile, navigation to Matches, Teams, Academy, Start Match, and Logout
 - [x] Android System Bar & Safe Area Insets Layout Fix: Wrapped root with `SafeAreaProvider`, handled top inset for red header with `light-content` status bar, and accommodated Android system navigation bar in bottom tabs layout
+- [x] Team creation persistence-safety fix: Removed synthetic local fallback in `TeamsScreen.tsx`; `createTeam()` API failure now prevents state mutation, displays clear status-based inline error banners, and only creates teams on verified 2xx backend success
 
 ### In Progress
 
