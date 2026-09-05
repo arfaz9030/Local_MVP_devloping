@@ -4,7 +4,7 @@
  */
 import { getToken, saveToken } from './tokenService';
 
-export const BASE_URL = 'http://192.168.29.120:2020';
+export const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 // export interface ApiResponse<T = any> {
 //   success: boolean;
 //   message: string;
