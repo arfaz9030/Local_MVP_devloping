@@ -113,7 +113,8 @@ export default function RootLayout() {
             <Stack.Screen
               name="create-match"
               options={{
-                title: 'Create Match',
+                headerShown: false,
+                title: 'Start Match',
               }}
             />
 

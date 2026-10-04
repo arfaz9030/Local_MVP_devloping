@@ -85,6 +85,14 @@ Complete Teams + Players Module (frontend and backend integration).
 - [x] Minimal App Drawer (`AppDrawer.tsx`) with user profile, navigation to Matches, Teams, Academy, Start Match, and Logout
 - [x] Android System Bar & Safe Area Insets Layout Fix: Wrapped root with `SafeAreaProvider`, handled top inset for red header with `light-content` status bar, and accommodated Android system navigation bar in bottom tabs layout
 - [x] Team creation persistence-safety fix: Removed synthetic local fallback in `TeamsScreen.tsx`; `createTeam()` API failure now prevents state mutation, displays clear status-based inline error banners, and only creates teams on verified 2xx backend success
+- [x] Start Match 6-stage flow implementation matching all 18 reference screenshots:
+  - Match settings, overs selection, bowler quota limits, ball type, pitch type, and venue/time
+  - Ground picker modal (`GroundPickerModal.tsx`) with search, popular grounds, and custom ground addition
+  - Match officials (`AddOfficialModal.tsx`) with Umpires (1, 2, 3rd), Scorers (with "Assign Myself"), and Commentators
+  - Squad selection & Playing XI manager with team switcher tabs, checkboxes, player search, and quick squad addition (`AddSquadPlayerModal.tsx`)
+  - Captain & Wicket Keeper selection screen with dual `[ C ]` and `[ WK ]` toggle controls
+  - Interactive Toss screen with Team vs Team cards, interactive coin flip, and BAT/BOWL decision cards
+  - Openers selection (Striker, Non-Striker, Opening Bowler) with batting/bowling style tags, match overview, and Start Scoring integration
 
 ### In Progress
 

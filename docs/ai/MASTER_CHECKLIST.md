@@ -197,16 +197,20 @@ Status
 
 # Phase 5 — Match Creation
 
-- [x] Create Match Screen UI & Setup Flow
+- [x] Create Match Screen UI & Setup Flow (6-stage wizard matching all 18 reference screenshots)
 - [x] Select Teams (Team A & Team B selection from existing teams via TeamPickerModal)
-- [x] Match Settings (Overs, Ball Type, Match Type selection chips)
-- [ ] Toss
-- [ ] Playing XI
-- [ ] Match backend integration
+- [x] Match Settings (Overs, Ball Type, Pitch Type, Match Type selection chips, Bowler limits)
+- [x] Ground / Venue selection (`GroundPickerModal.tsx` with search, popular grounds, and custom entry)
+- [x] Match Officials management (`AddOfficialModal.tsx` for Umpires, Scorers with self-assignment, Commentators)
+- [x] Playing XI & Squad selection (team tabs, checkboxes, search, counter, quick add player via `AddSquadPlayerModal.tsx`)
+- [x] Captain & Wicket Keeper selection (dual `[ C ]` and `[ WK ]` toggle controls)
+- [x] Toss (Winner selection, interactive coin flip, elected to bat/bowl)
+- [x] Openers selection (Striker, Non-Striker, Opening Bowler)
+- [ ] Match backend integration (persisted match data in database)
 
 Status
 
-🟡 Frontend Demo Complete (Select Team A/B + Settings)
+🟡 Frontend Implementation Complete (Full 6-Stage UI Flow matching 18 screenshots; backend integration pending)
 
 ---
 
