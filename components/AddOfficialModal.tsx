@@ -84,9 +84,9 @@ export const AddOfficialModal: React.FC<AddOfficialModalProps> = ({
   const handleSelectSelf = () => {
     onSaveOfficial({
       id: 'self_' + Date.now(),
-      name: 'MohammadArfaz Shaik',
+      name: 'Match Scorer (You)',
       phone: '9876543210',
-      city: 'Hyderabad (Telangana)',
+      city: 'Local',
       role,
       isSelf: true,
     });
@@ -196,12 +196,12 @@ export const AddOfficialModal: React.FC<AddOfficialModalProps> = ({
               </View>
               <View style={styles.selfInfo}>
                 <View style={styles.nameBadgeRow}>
-                  <Text style={styles.selfName}>MohammadArfaz Shaik</Text>
+                  <Text style={styles.selfName}>Current User</Text>
                   <View style={styles.youBadge}>
                     <Text style={styles.youBadgeText}>YOU</Text>
                   </View>
                 </View>
-                <Text style={styles.selfPhone}>+91 9876543210 • Captain</Text>
+                <Text style={styles.selfPhone}>Assign as Official</Text>
               </View>
               <View style={styles.assignChip}>
                 <Text style={styles.assignChipText}>Select Myself</Text>

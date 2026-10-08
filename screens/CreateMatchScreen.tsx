@@ -26,16 +26,17 @@ import { createMatch, getTeams } from '../src/api/matchApi';
 import { COLORS } from '../src/theme/color';
 import { FONT_SIZE, FONT_WEIGHT } from '../src/theme/typography';
 
-// Stages in the Start Match flow (guided by the 18 screenshots)
-type MatchSetupStage =
-  | 'SETTINGS' // Screen 1, 3: Match settings, overs, ground
-  | 'OFFICIALS' // Screen 2, 4-11: Umpires, scorers, commentators
-  | 'SQUADS' // Screen 11-post, 12, 13, 14: Playing XI selection
-  | 'CAPTAIN_WK' // Screen 16: Choose Captain and Wicket Keeper
-  | 'TOSS' // Screen 17: Who won toss, elected to bat/bowl
-  | 'OPENERS'; // Screen 18: Select striker, non-striker & opening bowler
+// Stages in the Start Match flow (guided by the 18 screenshots + Team Selection Entry)
+export type MatchSetupStage =
+  | 'TEAM_SELECT' // Step 1: Select Team 1 & Team 2 from actual CrickHero teams
+  | 'SETTINGS' // Step 2 (Screens 1, 3): Match settings, overs, ground
+  | 'OFFICIALS' // Step 3 (Screens 2, 4-11): Umpires, scorers, commentators
+  | 'SQUADS' // Step 4 (Screens 11-post, 12, 13, 14): Playing XI selection
+  | 'CAPTAIN_WK' // Step 5 (Screen 16): Choose Captain and Wicket Keeper
+  | 'TOSS' // Step 6 (Screen 17): Who won toss, elected to bat/bowl
+  | 'OPENERS'; // Step 7 (Screen 18): Select striker, non-striker & opening bowler
 
-interface SquadPlayer {
+export interface SquadPlayer {
   id: string;
   name: string;
   jerseyNumber?: number;
@@ -43,34 +44,6 @@ interface SquadPlayer {
   battingStyle?: string;
   bowlingStyle?: string;
 }
-
-const DEFAULT_TEAM_1_PLAYERS: SquadPlayer[] = [
-  { id: 't1_p1', name: 'MohammadArfaz Shaik', jerseyNumber: 7, role: 'All-Rounder', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Medium' },
-  { id: 't1_p2', name: 'Rahul Sharma', jerseyNumber: 18, role: 'Batsman', battingStyle: 'Right Hand Bat' },
-  { id: 't1_p3', name: 'Sai Teja', jerseyNumber: 12, role: 'Batsman', battingStyle: 'Left Hand Bat' },
-  { id: 't1_p4', name: 'Vikram Reddy', jerseyNumber: 99, role: 'WK-Batsman', battingStyle: 'Right Hand Bat' },
-  { id: 't1_p5', name: 'Suresh Raina', jerseyNumber: 3, role: 'All-Rounder', battingStyle: 'Left Hand Bat', bowlingStyle: 'Right-arm Spin' },
-  { id: 't1_p6', name: 'Abdul Raheem', jerseyNumber: 11, role: 'Bowler', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Fast' },
-  { id: 't1_p7', name: 'Pranav Rao', jerseyNumber: 24, role: 'Bowler', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Spin' },
-  { id: 't1_p8', name: 'Nikhil Varma', jerseyNumber: 8, role: 'Bowler', battingStyle: 'Left Hand Bat', bowlingStyle: 'Left-arm Fast' },
-  { id: 't1_p9', name: 'Dinesh Karthik', jerseyNumber: 21, role: 'Batsman', battingStyle: 'Right Hand Bat' },
-  { id: 't1_p10', name: 'Sameer Khan', jerseyNumber: 45, role: 'All-Rounder', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Fast' },
-  { id: 't1_p11', name: 'Harish Kumar', jerseyNumber: 15, role: 'Bowler', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Medium' },
-];
-
-const DEFAULT_TEAM_2_PLAYERS: SquadPlayer[] = [
-  { id: 't2_p1', name: 'Ahmed Khan', jerseyNumber: 10, role: 'Bowler', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Fast' },
-  { id: 't2_p2', name: 'Zubair Mohammed', jerseyNumber: 17, role: 'Batsman', battingStyle: 'Right Hand Bat' },
-  { id: 't2_p3', name: 'Farhan Ali', jerseyNumber: 9, role: 'Batsman', battingStyle: 'Left Hand Bat' },
-  { id: 't2_p4', name: 'Shoaib Akhtar', jerseyNumber: 14, role: 'Bowler', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Fast' },
-  { id: 't2_p5', name: 'Tariq Aziz', jerseyNumber: 33, role: 'WK-Batsman', battingStyle: 'Right Hand Bat' },
-  { id: 't2_p6', name: 'Rizwan Sheikh', jerseyNumber: 77, role: 'All-Rounder', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Medium' },
-  { id: 't2_p7', name: 'Bilal Hassan', jerseyNumber: 5, role: 'Bowler', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Spin' },
-  { id: 't2_p8', name: 'Imran Siddiqui', jerseyNumber: 22, role: 'Batsman', battingStyle: 'Right Hand Bat' },
-  { id: 't2_p9', name: 'Asif Nawaz', jerseyNumber: 16, role: 'All-Rounder', battingStyle: 'Left Hand Bat', bowlingStyle: 'Left-arm Spin' },
-  { id: 't2_p10', name: 'Danish Qureshi', jerseyNumber: 19, role: 'Bowler', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Medium' },
-  { id: 't2_p11', name: 'Yasir Shah', jerseyNumber: 88, role: 'Bowler', battingStyle: 'Right Hand Bat', bowlingStyle: 'Right-arm Spin' },
-];
 
 const OVERS_OPTIONS = [5, 8, 10, 12, 15, 20];
 const BALL_TYPES = ['Tennis', 'Leather', 'Rubber / Tape'];
@@ -84,27 +57,19 @@ export default function CreateMatchScreen() {
   const bottomInset = insets.bottom;
   const router = useRouter();
 
-  // Current stage in the flow
-  const [currentStage, setCurrentStage] = useState<MatchSetupStage>('SETTINGS');
+  // Current stage in the flow: Starts strictly with TEAM_SELECT
+  const [currentStage, setCurrentStage] = useState<MatchSetupStage>('TEAM_SELECT');
 
-  // Loaded teams for picking
+  // Loaded real teams from backend
   const [teams, setTeams] = useState<TeamItem[]>([]);
-  const [, setLoadingTeams] = useState(true);
+  const [loadingTeams, setLoadingTeams] = useState(true);
+  const [teamsError, setTeamsError] = useState('');
 
-  // STAGE 1: Selected Teams & Match Settings
-  const [team1, setTeam1] = useState<{ id?: string; name: string; captainName?: string; city?: string } | null>({
-    id: '1',
-    name: 'Hyderabad Nizampet Boys',
-    captainName: 'MohammadArfaz Shaik',
-    city: 'Hyderabad (Telangana)',
-  });
-  const [team2, setTeam2] = useState<{ id?: string; name: string; captainName?: string; city?: string } | null>({
-    id: '2',
-    name: 'Hyderabad Tolichowki Boys',
-    captainName: 'Ahmed Khan',
-    city: 'Hyderabad (Telangana)',
-  });
+  // Selected Teams: Start strictly null, populated only from real user selection
+  const [team1, setTeam1] = useState<{ id?: string; name: string; captainName?: string; city?: string } | null>(null);
+  const [team2, setTeam2] = useState<{ id?: string; name: string; captainName?: string; city?: string } | null>(null);
 
+  // Match Settings state (Stage 2)
   const [selectedOvers, setSelectedOvers] = useState<number>(10);
   const [selectedBall, setSelectedBall] = useState<string>('Tennis');
   const [selectedPitch, setSelectedPitch] = useState<string>('Turf');
@@ -114,11 +79,11 @@ export default function CreateMatchScreen() {
   const [matchDateTime, setMatchDateTime] = useState<string>('Today, 04:00 PM');
   const [oversPerBowler, setOversPerBowler] = useState<number>(2);
 
-  // Modal pickers for Stage 1
+  // Modal pickers
   const [teamPickerMode, setTeamPickerMode] = useState<'team1' | 'team2' | null>(null);
   const [groundPickerVisible, setGroundPickerVisible] = useState(false);
 
-  // STAGE 2: Match Officials
+  // Officials State (Stage 3)
   const [officials, setOfficials] = useState<{
     umpire1: OfficialMember | null;
     umpire2: OfficialMember | null;
@@ -130,48 +95,36 @@ export default function CreateMatchScreen() {
     umpire1: null,
     umpire2: null,
     thirdUmpire: null,
-    scorer1: {
-      id: 'self_1',
-      name: 'MohammadArfaz Shaik',
-      phone: '9876543210',
-      city: 'Hyderabad (Telangana)',
-      role: 'scorer1',
-      isSelf: true,
-    },
+    scorer1: null,
     scorer2: null,
     commentator: null,
   });
 
-  // Modal state for adding official
   const [activeOfficialModalRole, setActiveOfficialModalRole] = useState<OfficialRole | null>(null);
 
-  // STAGE 3: Squad Selection (Playing XI)
-  const [team1Players, setTeam1Players] = useState<SquadPlayer[]>(DEFAULT_TEAM_1_PLAYERS);
-  const [team2Players, setTeam2Players] = useState<SquadPlayer[]>(DEFAULT_TEAM_2_PLAYERS);
-  const [team1SelectedPlayerIds, setTeam1SelectedPlayerIds] = useState<string[]>(
-    DEFAULT_TEAM_1_PLAYERS.map((p) => p.id)
-  );
-  const [team2SelectedPlayerIds, setTeam2SelectedPlayerIds] = useState<string[]>(
-    DEFAULT_TEAM_2_PLAYERS.map((p) => p.id)
-  );
+  // Squad Selection State (Stage 4)
+  const [team1Players, setTeam1Players] = useState<SquadPlayer[]>([]);
+  const [team2Players, setTeam2Players] = useState<SquadPlayer[]>([]);
+  const [team1SelectedPlayerIds, setTeam1SelectedPlayerIds] = useState<string[]>([]);
+  const [team2SelectedPlayerIds, setTeam2SelectedPlayerIds] = useState<string[]>([]);
   const [activeSquadTab, setActiveSquadTab] = useState<'team1' | 'team2'>('team1');
   const [squadSearchQuery, setSquadSearchQuery] = useState('');
   const [addPlayerModalTeam, setAddPlayerModalTeam] = useState<'team1' | 'team2' | null>(null);
 
-  // STAGE 4: Captain & Wicket Keeper
+  // Captain & Wicket Keeper State (Stage 5)
   const [activeCapWkTab, setActiveCapWkTab] = useState<'team1' | 'team2'>('team1');
-  const [team1CaptainId, setTeam1CaptainId] = useState<string>('t1_p1');
-  const [team1WkId, setTeam1WkId] = useState<string>('t1_p4');
-  const [team2CaptainId, setTeam2CaptainId] = useState<string>('t2_p1');
-  const [team2WkId, setTeam2WkId] = useState<string>('t2_p5');
+  const [team1CaptainId, setTeam1CaptainId] = useState<string>('');
+  const [team1WkId, setTeam1WkId] = useState<string>('');
+  const [team2CaptainId, setTeam2CaptainId] = useState<string>('');
+  const [team2WkId, setTeam2WkId] = useState<string>('');
 
-  // STAGE 5: Toss
-  const [tossWinnerTeam, setTossWinnerTeam] = useState<'team1' | 'team2' | null>('team1');
+  // Toss State (Stage 6)
+  const [tossWinnerTeam, setTossWinnerTeam] = useState<'team1' | 'team2' | null>(null);
   const [tossDecision, setTossDecision] = useState<'BAT' | 'BOWL'>('BAT');
   const [isFlippingCoin, setIsFlippingCoin] = useState(false);
   const [coinTossResult, setCoinTossResult] = useState<string>('');
 
-  // STAGE 6: Openers & Opening Bowler
+  // Openers & Opening Bowler State (Stage 7)
   const [strikerId, setStrikerId] = useState<string>('');
   const [nonStrikerId, setNonStrikerId] = useState<string>('');
   const [openingBowlerId, setOpeningBowlerId] = useState<string>('');
@@ -186,32 +139,98 @@ export default function CreateMatchScreen() {
     setOversPerBowler(Math.max(1, Math.ceil(selectedOvers / 5)));
   }, [selectedOvers]);
 
-  // Load backend teams
-  useEffect(() => {
-    const fetchTeamsList = async () => {
-      try {
-        setLoadingTeams(true);
-        const data = await getTeams();
-        if (Array.isArray(data) && data.length > 0) {
-          setTeams(
-            data.map((t: any) => ({
-              id: String(t.id),
-              name: t.name,
-              captainName: t.captainName,
-              city: t.city || 'Hyderabad (Telangana)',
-              players: t.players || [],
-            }))
-          );
-        }
-      } catch (err) {
-        console.log('Using default mock teams for match setup', err);
-      } finally {
-        setLoadingTeams(false);
+  // Load backend teams - strictly real data, no synthetic fallback
+  const fetchTeamsList = async () => {
+    try {
+      setLoadingTeams(true);
+      setTeamsError('');
+      const data = await getTeams();
+      if (Array.isArray(data)) {
+        const formattedTeams: TeamItem[] = data.map((t: any) => ({
+          id: String(t.id),
+          name: t.name,
+          captainName: t.captainName,
+          city: t.city || 'Hyderabad (Telangana)',
+          logoUrl: t.logoUrl,
+          players: Array.isArray(t.players)
+            ? t.players.map((p: any) => ({
+                id: String(p.id),
+                name: p.name,
+                jerseyNumber: p.jerseyNumber,
+                role: p.role,
+                mobileNumber: p.mobileNumber,
+              }))
+            : [],
+        }));
+        setTeams(formattedTeams);
+      } else {
+        setTeams([]);
       }
-    };
+    } catch (err: any) {
+      const msg = err?.message || 'Could not load teams from server.';
+      setTeamsError(msg);
+      setTeams([]);
+    } finally {
+      setLoadingTeams(false);
+    }
+  };
 
+  useEffect(() => {
     fetchTeamsList();
   }, []);
+
+  // Update real squad players when team1 or team2 is selected or changes
+  const updateTeamSquadFromTeamItem = (selectedTeam: { id?: string; name: string } | null, target: 'team1' | 'team2') => {
+    if (!selectedTeam) {
+      if (target === 'team1') {
+        setTeam1Players([]);
+        setTeam1SelectedPlayerIds([]);
+        setTeam1CaptainId('');
+        setTeam1WkId('');
+      } else {
+        setTeam2Players([]);
+        setTeam2SelectedPlayerIds([]);
+        setTeam2CaptainId('');
+        setTeam2WkId('');
+      }
+      return;
+    }
+
+    // Find actual team object in loaded teams
+    const fullTeam = teams.find((t) => t.id === selectedTeam.id || t.name === selectedTeam.name);
+    const loadedPlayers: SquadPlayer[] = fullTeam?.players
+      ? fullTeam.players.map((p) => ({
+          id: String(p.id),
+          name: p.name,
+          jerseyNumber: p.jerseyNumber,
+          role: p.role || 'Player',
+          battingStyle: 'Right Hand Bat',
+          bowlingStyle: 'Right-arm Medium',
+        }))
+      : [];
+
+    if (target === 'team1') {
+      setTeam1Players(loadedPlayers);
+      setTeam1SelectedPlayerIds(loadedPlayers.map((p) => p.id));
+      if (loadedPlayers.length > 0) {
+        setTeam1CaptainId(loadedPlayers[0].id);
+        setTeam1WkId(loadedPlayers[Math.min(1, loadedPlayers.length - 1)].id);
+      } else {
+        setTeam1CaptainId('');
+        setTeam1WkId('');
+      }
+    } else {
+      setTeam2Players(loadedPlayers);
+      setTeam2SelectedPlayerIds(loadedPlayers.map((p) => p.id));
+      if (loadedPlayers.length > 0) {
+        setTeam2CaptainId(loadedPlayers[0].id);
+        setTeam2WkId(loadedPlayers[Math.min(1, loadedPlayers.length - 1)].id);
+      } else {
+        setTeam2CaptainId('');
+        setTeam2WkId('');
+      }
+    }
+  };
 
   // Compute batting and bowling teams based on toss
   const battingTeam = useMemo(() => {
@@ -226,14 +245,14 @@ export default function CreateMatchScreen() {
     return battingTeam === 'team1' ? 'team2' : 'team1';
   }, [battingTeam]);
 
-  // Batting players available for openers
+  // Real Batting players available for openers
   const battingPlayers = useMemo(() => {
     const sourceList = battingTeam === 'team1' ? team1Players : team2Players;
     const selectedIds = battingTeam === 'team1' ? team1SelectedPlayerIds : team2SelectedPlayerIds;
     return sourceList.filter((p) => selectedIds.includes(p.id));
   }, [battingTeam, team1Players, team2Players, team1SelectedPlayerIds, team2SelectedPlayerIds]);
 
-  // Bowling players available for opening bowler
+  // Real Bowling players available for opening bowler
   const bowlingPlayers = useMemo(() => {
     const sourceList = bowlingTeam === 'team1' ? team1Players : team2Players;
     const selectedIds = bowlingTeam === 'team1' ? team1SelectedPlayerIds : team2SelectedPlayerIds;
@@ -244,13 +263,27 @@ export default function CreateMatchScreen() {
   useEffect(() => {
     if (currentStage === 'OPENERS') {
       if (battingPlayers.length >= 2) {
-        if (!strikerId) setStrikerId(battingPlayers[0].id);
-        if (!nonStrikerId) setNonStrikerId(battingPlayers[1].id);
+        if (!strikerId || !battingPlayers.some((p) => p.id === strikerId)) {
+          setStrikerId(battingPlayers[0].id);
+        }
+        if (!nonStrikerId || !battingPlayers.some((p) => p.id === nonStrikerId)) {
+          setNonStrikerId(battingPlayers[1].id);
+        }
+      } else if (battingPlayers.length === 1) {
+        setStrikerId(battingPlayers[0].id);
+        setNonStrikerId('');
+      } else {
+        setStrikerId('');
+        setNonStrikerId('');
       }
-      if (bowlingPlayers.length >= 1 && !openingBowlerId) {
-        // Prefer bowler
-        const bowler = bowlingPlayers.find((p) => p.role === 'Bowler') || bowlingPlayers[0];
-        setOpeningBowlerId(bowler.id);
+
+      if (bowlingPlayers.length >= 1) {
+        if (!openingBowlerId || !bowlingPlayers.some((p) => p.id === openingBowlerId)) {
+          const bowler = bowlingPlayers.find((p) => p.role === 'Bowler') || bowlingPlayers[0];
+          setOpeningBowlerId(bowler.id);
+        }
+      } else {
+        setOpeningBowlerId('');
       }
     }
   }, [currentStage, battingPlayers, bowlingPlayers, strikerId, nonStrikerId, openingBowlerId]);
@@ -259,8 +292,11 @@ export default function CreateMatchScreen() {
   const handleBack = () => {
     setErrorMsg('');
     switch (currentStage) {
-      case 'SETTINGS':
+      case 'TEAM_SELECT':
         router.back();
+        break;
+      case 'SETTINGS':
+        setCurrentStage('TEAM_SELECT');
         break;
       case 'OFFICIALS':
         setCurrentStage('SETTINGS');
@@ -280,43 +316,59 @@ export default function CreateMatchScreen() {
     }
   };
 
-  // Stage 1 validation -> next
-  const handleProceedFromSettings = () => {
+  // Step 1: Team Selection validation -> Step 2: Settings
+  const handleProceedFromTeamSelect = () => {
     setErrorMsg('');
     if (!team1 || !team1.name.trim()) {
       setErrorMsg('Please select Team 1 (Your Team)');
-      Alert.alert('Validation Error', 'Please select Team 1');
+      Alert.alert('Selection Required', 'Please select Team 1 (Your Team) to proceed.');
       return;
     }
     if (!team2 || !team2.name.trim()) {
-      setErrorMsg('Please select Team 2 (Opponent Team)');
-      Alert.alert('Validation Error', 'Please select Team 2');
+      setErrorMsg('Please select Team 2 (Opponent)');
+      Alert.alert('Selection Required', 'Please select Team 2 (Opponent) to proceed.');
       return;
     }
-    if (team1.name.trim().toLowerCase() === team2.name.trim().toLowerCase()) {
+    if (
+      (team1.id && team2.id && team1.id === team2.id) ||
+      team1.name.trim().toLowerCase() === team2.name.trim().toLowerCase()
+    ) {
       setErrorMsg('Team 1 and Team 2 must be different teams');
-      Alert.alert('Validation Error', 'Team 1 and Team 2 must be different teams');
+      Alert.alert('Invalid Selection', 'Team 1 and Team 2 must be different teams.');
       return;
     }
+    setCurrentStage('SETTINGS');
+  };
+
+  // Step 2: Settings validation -> Step 3: Officials
+  const handleProceedFromSettings = () => {
+    setErrorMsg('');
     setCurrentStage('OFFICIALS');
   };
 
-  // Stage 2 -> Stage 3
+  // Step 3: Officials -> Step 4: Squads
   const handleProceedFromOfficials = () => {
     setCurrentStage('SQUADS');
   };
 
-  // Stage 3 validation -> next
+  // Step 4: Squads validation -> Step 5: Captain & WK
   const handleProceedFromSquads = () => {
     if (team1SelectedPlayerIds.length < 2) {
-      Alert.alert('Incomplete Squad', `Please select at least 2 players for ${team1?.name}`);
+      Alert.alert(
+        'Incomplete Squad',
+        `Please select at least 2 players for ${team1?.name}. You can tap "+ Add Player" to add new players directly.`
+      );
       return;
     }
     if (team2SelectedPlayerIds.length < 2) {
-      Alert.alert('Incomplete Squad', `Please select at least 2 players for ${team2?.name}`);
+      Alert.alert(
+        'Incomplete Squad',
+        `Please select at least 2 players for ${team2?.name}. You can tap "+ Add Player" to add new players directly.`
+      );
       return;
     }
-    // Make sure captain and WK are selected from current squad
+
+    // Ensure Captain and WK are in the selected playing squad
     if (!team1SelectedPlayerIds.includes(team1CaptainId)) {
       setTeam1CaptainId(team1SelectedPlayerIds[0]);
     }
@@ -333,7 +385,7 @@ export default function CreateMatchScreen() {
     setCurrentStage('CAPTAIN_WK');
   };
 
-  // Stage 4 validation -> next
+  // Step 5: Captain & WK validation -> Step 6: Toss
   const handleProceedFromCaptainWk = () => {
     if (!team1CaptainId || !team1WkId) {
       Alert.alert('Selection Required', `Please choose both Captain and Wicket Keeper for ${team1?.name}`);
@@ -346,7 +398,7 @@ export default function CreateMatchScreen() {
     setCurrentStage('TOSS');
   };
 
-  // Stage 5 validation -> next
+  // Step 6: Toss validation -> Step 7: Openers
   const handleProceedFromToss = () => {
     if (!tossWinnerTeam) {
       Alert.alert('Toss Required', 'Please specify who won the toss.');
@@ -387,6 +439,8 @@ export default function CreateMatchScreen() {
 
     try {
       setSubmitting(true);
+      setErrorMsg('');
+
       const match = await createMatch({
         team1Name: team1!.name.trim(),
         team2Name: team2!.name.trim(),
@@ -416,31 +470,9 @@ export default function CreateMatchScreen() {
         ]
       );
     } catch (err: any) {
-      // If backend network error, still route smoothly to match details for local offline scoring
-      const fallbackId = 'M_' + Date.now().toString().slice(-4);
-      Alert.alert(
-        'Match Initialized',
-        `Match setup completed for ${team1?.name} vs ${team2?.name}. Proceeding to scoring screen.`,
-        [
-          {
-            text: 'Start Scoring',
-            onPress: () => {
-              router.replace({
-                pathname: '/match/[matchId]',
-                params: {
-                  matchId: fallbackId,
-                  team1Name: team1!.name,
-                  team2Name: team2!.name,
-                  runs: '0',
-                  wickets: '0',
-                  overs: '0.0',
-                  status: 'LIVE',
-                },
-              });
-            },
-          },
-        ]
-      );
+      const msg = err?.message || 'Failed to start match on the server. Please check your network and try again.';
+      setErrorMsg(msg);
+      Alert.alert('Match Creation Failed', msg);
     } finally {
       setSubmitting(false);
     }
@@ -459,9 +491,11 @@ export default function CreateMatchScreen() {
     }
   };
 
-  // Render Stage Title & Stepper Header
+  // Stage Title & Stepper Header
   const getStageTitle = () => {
     switch (currentStage) {
+      case 'TEAM_SELECT':
+        return 'Select Teams';
       case 'SETTINGS':
         return 'Match Settings';
       case 'OFFICIALS':
@@ -479,20 +513,24 @@ export default function CreateMatchScreen() {
 
   const getStageStepNumber = () => {
     switch (currentStage) {
-      case 'SETTINGS':
+      case 'TEAM_SELECT':
         return 1;
-      case 'OFFICIALS':
+      case 'SETTINGS':
         return 2;
-      case 'SQUADS':
+      case 'OFFICIALS':
         return 3;
-      case 'CAPTAIN_WK':
+      case 'SQUADS':
         return 4;
-      case 'TOSS':
+      case 'CAPTAIN_WK':
         return 5;
-      case 'OPENERS':
+      case 'TOSS':
         return 6;
+      case 'OPENERS':
+        return 7;
     }
   };
+
+  const totalSteps = 7;
 
   return (
     <View style={[styles.container, { paddingTop: topInset }]}>
@@ -506,7 +544,9 @@ export default function CreateMatchScreen() {
 
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerTitleText}>{getStageTitle()}</Text>
-          <Text style={styles.headerStepText}>Step {getStageStepNumber()} of 6</Text>
+          <Text style={styles.headerStepText}>
+            Step {getStageStepNumber()} of {totalSteps}
+          </Text>
         </View>
 
         <TouchableOpacity
@@ -514,7 +554,7 @@ export default function CreateMatchScreen() {
           onPress={() =>
             Alert.alert(
               'CrickHero Match Setup',
-              'Configure your teams, match overs, ground, officials, Playing 11, captain, and toss to begin scoring.'
+              'Select existing teams, configure overs and conditions, verify officials, pick squads, captain & toss to begin scoring.'
             )
           }
         >
@@ -524,7 +564,7 @@ export default function CreateMatchScreen() {
 
       {/* Stepper Progress Bar */}
       <View style={styles.stepperContainer}>
-        {[1, 2, 3, 4, 5, 6].map((step) => {
+        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => {
           const isActive = step === getStageStepNumber();
           const isDone = step < getStageStepNumber();
           return (
@@ -549,7 +589,204 @@ export default function CreateMatchScreen() {
       ) : null}
 
       {/* ========================================================================= */}
-      {/* STAGE 1: MATCH SETTINGS & OVERS (Screenshots 1 & 3)                      */}
+      {/* STEP 1: SELECT EXISTING TEAMS (Mandatory Entry Before Settings)           */}
+      {/* ========================================================================= */}
+      {currentStage === 'TEAM_SELECT' ? (
+        <View style={styles.stageWrapper}>
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomInset + 80 }]}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.infoBanner}>
+              <Icon source="shield-account" size={22} color={COLORS.brandTeal} />
+              <Text style={styles.infoBannerText}>
+                Select two existing teams created in CrickHero to begin match setup.
+              </Text>
+            </View>
+
+            {loadingTeams ? (
+              <View style={styles.centerLoadingBox}>
+                <ActivityIndicator size="large" color={COLORS.brandTeal} />
+                <Text style={styles.centerLoadingText}>Loading your teams...</Text>
+              </View>
+            ) : teamsError ? (
+              <View style={styles.emptyContainer}>
+                <Icon source="alert-circle-outline" size={48} color="#F87171" />
+                <Text style={styles.emptyTitle}>Could not load teams</Text>
+                <Text style={styles.emptySubtitle}>{teamsError}</Text>
+                <TouchableOpacity style={styles.emptyBtn} onPress={fetchTeamsList}>
+                  <Text style={styles.emptyBtnText}>Retry Loading Teams</Text>
+                </TouchableOpacity>
+              </View>
+            ) : teams.length === 0 ? (
+              /* Proper Empty State: No fabricated teams */
+              <View style={styles.emptyContainer}>
+                <Icon source="account-group-outline" size={54} color={COLORS.textDarkSecondary} />
+                <Text style={styles.emptyTitle}>No Teams Available</Text>
+                <Text style={styles.emptySubtitle}>
+                  You need at least one team created in CrickHero to start a match. Please create your team first.
+                </Text>
+                <TouchableOpacity
+                  style={styles.emptyBtn}
+                  onPress={() => router.push('/(tabs)/teams')}
+                >
+                  <Icon source="plus" size={18} color={COLORS.surfaceWhite} />
+                  <Text style={styles.emptyBtnText}>Go to Teams & Create Team</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View>
+                {/* Team 1 / My Team Card */}
+                <View style={styles.formCard}>
+                  <View style={styles.sectionHeaderBetween}>
+                    <Text style={styles.cardHeaderTitle}>TEAM 1 (MY TEAM / HOST)</Text>
+                    <View style={[styles.teamBadgePill, { backgroundColor: '#16A34A' }]}>
+                      <Text style={styles.teamBadgePillText}>TEAM A</Text>
+                    </View>
+                  </View>
+
+                  {team1 ? (
+                    <View style={styles.selectedTeamBox}>
+                      <View style={[styles.matchupAvatar, { backgroundColor: '#16A34A' }]}>
+                        <Text style={styles.matchupAvatarText}>
+                          {team1.name.substring(0, 2).toUpperCase()}
+                        </Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.selectedTeamName}>{team1.name}</Text>
+                        <Text style={styles.selectedTeamSub}>
+                          Captain: {team1.captainName || 'Not specified'} • {team1.city || 'City'}
+                        </Text>
+                        <Text style={styles.selectedTeamPlayerCount}>
+                          {team1Players.length} players registered in squad
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.changeTeamBtn}
+                        onPress={() => setTeamPickerMode('team1')}
+                      >
+                        <Text style={styles.changeTeamBtnText}>Change</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.selectTeamPlaceholder}
+                      onPress={() => setTeamPickerMode('team1')}
+                    >
+                      <Icon source="plus-circle-outline" size={24} color={COLORS.brandTeal} />
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.placeholderTitle}>Select Team 1</Text>
+                        <Text style={styles.placeholderSub}>Tap to pick from existing teams</Text>
+                      </View>
+                      <Icon source="chevron-right" size={22} color={COLORS.placeholder} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {/* Team 2 / Opponent Card */}
+                <View style={styles.formCard}>
+                  <View style={styles.sectionHeaderBetween}>
+                    <Text style={styles.cardHeaderTitle}>TEAM 2 (OPPONENT)</Text>
+                    <View style={[styles.teamBadgePill, { backgroundColor: '#DC2626' }]}>
+                      <Text style={styles.teamBadgePillText}>TEAM B</Text>
+                    </View>
+                  </View>
+
+                  {team2 ? (
+                    <View style={styles.selectedTeamBox}>
+                      <View style={[styles.matchupAvatar, { backgroundColor: '#DC2626' }]}>
+                        <Text style={styles.matchupAvatarText}>
+                          {team2.name.substring(0, 2).toUpperCase()}
+                        </Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.selectedTeamName}>{team2.name}</Text>
+                        <Text style={styles.selectedTeamSub}>
+                          Captain: {team2.captainName || 'Not specified'} • {team2.city || 'City'}
+                        </Text>
+                        <Text style={styles.selectedTeamPlayerCount}>
+                          {team2Players.length} players registered in squad
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.changeTeamBtn}
+                        onPress={() => setTeamPickerMode('team2')}
+                      >
+                        <Text style={styles.changeTeamBtnText}>Change</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.selectTeamPlaceholder}
+                      onPress={() => setTeamPickerMode('team2')}
+                    >
+                      <Icon source="plus-circle-outline" size={24} color={COLORS.brandTeal} />
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.placeholderTitle}>Select Team 2</Text>
+                        <Text style={styles.placeholderSub}>Tap to pick opponent or enter custom team</Text>
+                      </View>
+                      <Icon source="chevron-right" size={22} color={COLORS.placeholder} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {/* Matchup Preview Banner */}
+                {team1 && team2 ? (
+                  <View style={styles.matchupBox}>
+                    <View style={styles.matchupRow}>
+                      <View style={styles.matchupTeam}>
+                        <View style={[styles.matchupAvatar, { backgroundColor: '#16A34A' }]}>
+                          <Text style={styles.matchupAvatarText}>
+                            {team1.name.substring(0, 2).toUpperCase()}
+                          </Text>
+                        </View>
+                        <Text style={styles.matchupTeamName} numberOfLines={1}>
+                          {team1.name}
+                        </Text>
+                        <Text style={styles.matchupBadge}>HOST</Text>
+                      </View>
+
+                      <View style={styles.vsCircle}>
+                        <Text style={styles.vsText}>VS</Text>
+                      </View>
+
+                      <View style={styles.matchupTeam}>
+                        <View style={[styles.matchupAvatar, { backgroundColor: '#DC2626' }]}>
+                          <Text style={styles.matchupAvatarText}>
+                            {team2.name.substring(0, 2).toUpperCase()}
+                          </Text>
+                        </View>
+                        <Text style={styles.matchupTeamName} numberOfLines={1}>
+                          {team2.name}
+                        </Text>
+                        <Text style={styles.matchupBadge}>OPPONENT</Text>
+                      </View>
+                    </View>
+                  </View>
+                ) : null}
+              </View>
+            )}
+          </ScrollView>
+
+          {/* Sticky Bottom Next Button */}
+          {teams.length > 0 ? (
+            <View style={[styles.bottomBar, { paddingBottom: Math.max(bottomInset, 14) }]}>
+              <TouchableOpacity
+                style={[styles.nextCtaBtn, (!team1 || !team2) && styles.btnDisabled]}
+                onPress={handleProceedFromTeamSelect}
+                disabled={!team1 || !team2}
+              >
+                <Text style={styles.nextCtaBtnText}>Next: Match Settings</Text>
+                <Icon source="arrow-right" size={20} color={COLORS.surfaceWhite} />
+              </TouchableOpacity>
+            </View>
+          ) : null}
+        </View>
+      ) : null}
+
+      {/* ========================================================================= */}
+      {/* STEP 2: MATCH SETTINGS & OVERS (Screenshots 1 & 3)                        */}
       {/* ========================================================================= */}
       {currentStage === 'SETTINGS' ? (
         <View style={styles.stageWrapper}>
@@ -558,7 +795,7 @@ export default function CreateMatchScreen() {
             contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomInset + 80 }]}
             showsVerticalScrollIndicator={false}
           >
-            {/* Matchup Teams Banner */}
+            {/* Matchup Teams Banner with Real Selected Teams */}
             <View style={styles.matchupBox}>
               <View style={styles.matchupRow}>
                 {/* Team 1 */}
@@ -792,7 +1029,7 @@ export default function CreateMatchScreen() {
       ) : null}
 
       {/* ========================================================================= */}
-      {/* STAGE 2: MATCH OFFICIALS (Screenshots 2, 4-11)                             */}
+      {/* STEP 3: MATCH OFFICIALS (Screenshots 2, 4-11)                             */}
       {/* ========================================================================= */}
       {currentStage === 'OFFICIALS' ? (
         <View style={styles.stageWrapper}>
@@ -827,7 +1064,7 @@ export default function CreateMatchScreen() {
                   <View style={styles.officialInfo}>
                     <Text style={styles.officialName}>{officials.umpire1.name}</Text>
                     <Text style={styles.officialContact}>
-                      +91 {officials.umpire1.phone} • {officials.umpire1.city}
+                      +91 {officials.umpire1.phone} • {officials.umpire1.city || 'City'}
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -859,7 +1096,7 @@ export default function CreateMatchScreen() {
                   <View style={styles.officialInfo}>
                     <Text style={styles.officialName}>{officials.umpire2.name}</Text>
                     <Text style={styles.officialContact}>
-                      +91 {officials.umpire2.phone} • {officials.umpire2.city}
+                      +91 {officials.umpire2.phone} • {officials.umpire2.city || 'City'}
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -891,7 +1128,7 @@ export default function CreateMatchScreen() {
                   <View style={styles.officialInfo}>
                     <Text style={styles.officialName}>{officials.thirdUmpire.name}</Text>
                     <Text style={styles.officialContact}>
-                      +91 {officials.thirdUmpire.phone} • {officials.thirdUmpire.city}
+                      +91 {officials.thirdUmpire.phone} • {officials.thirdUmpire.city || 'City'}
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -1042,7 +1279,7 @@ export default function CreateMatchScreen() {
       ) : null}
 
       {/* ========================================================================= */}
-      {/* STAGE 3: SQUAD SELECTION / PLAYING XI (Screenshots 11-post, 12, 13, 14)    */}
+      {/* STEP 4: SQUAD SELECTION / PLAYING XI (Screenshots 11-post, 12, 13, 14)    */}
       {/* ========================================================================= */}
       {currentStage === 'SQUADS' ? (
         <View style={styles.stageWrapper}>
@@ -1137,30 +1374,32 @@ export default function CreateMatchScreen() {
               </Text>
             </Text>
 
-            <TouchableOpacity
-              onPress={() => {
-                if (activeSquadTab === 'team1') {
-                  if (team1SelectedPlayerIds.length === team1Players.length) {
-                    setTeam1SelectedPlayerIds([]);
+            {(activeSquadTab === 'team1' ? team1Players.length : team2Players.length) > 0 ? (
+              <TouchableOpacity
+                onPress={() => {
+                  if (activeSquadTab === 'team1') {
+                    if (team1SelectedPlayerIds.length === team1Players.length) {
+                      setTeam1SelectedPlayerIds([]);
+                    } else {
+                      setTeam1SelectedPlayerIds(team1Players.map((p) => p.id));
+                    }
                   } else {
-                    setTeam1SelectedPlayerIds(team1Players.map((p) => p.id));
+                    if (team2SelectedPlayerIds.length === team2Players.length) {
+                      setTeam2SelectedPlayerIds([]);
+                    } else {
+                      setTeam2SelectedPlayerIds(team2Players.map((p) => p.id));
+                    }
                   }
-                } else {
-                  if (team2SelectedPlayerIds.length === team2Players.length) {
-                    setTeam2SelectedPlayerIds([]);
-                  } else {
-                    setTeam2SelectedPlayerIds(team2Players.map((p) => p.id));
-                  }
-                }
-              }}
-            >
-              <Text style={styles.toggleAllText}>
-                {(activeSquadTab === 'team1' ? team1SelectedPlayerIds.length : team2SelectedPlayerIds.length) ===
-                (activeSquadTab === 'team1' ? team1Players.length : team2Players.length)
-                  ? 'Deselect All'
-                  : 'Select All'}
-              </Text>
-            </TouchableOpacity>
+                }}
+              >
+                <Text style={styles.toggleAllText}>
+                  {(activeSquadTab === 'team1' ? team1SelectedPlayerIds.length : team2SelectedPlayerIds.length) ===
+                  (activeSquadTab === 'team1' ? team1Players.length : team2Players.length)
+                    ? 'Deselect All'
+                    : 'Select All'}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
 
           {/* Players List with Checkboxes (Screenshots 12 & 13) */}
@@ -1170,6 +1409,23 @@ export default function CreateMatchScreen() {
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={[styles.squadListContent, { paddingBottom: bottomInset + 80 }]}
+            ListEmptyComponent={
+              <View style={styles.emptySquadContainer}>
+                <Icon source="account-off-outline" size={42} color={COLORS.textDarkSecondary} />
+                <Text style={styles.emptySquadTitle}>No players in squad yet</Text>
+                <Text style={styles.emptySquadSub}>
+                  {activeSquadTab === 'team1' ? team1?.name : team2?.name} has no players registered.
+                  Tap &ldquo;+ Add Player&rdquo; above to add players to this squad.
+                </Text>
+                <TouchableOpacity
+                  style={styles.emptySquadAddBtn}
+                  onPress={() => setAddPlayerModalTeam(activeSquadTab)}
+                >
+                  <Icon source="account-plus" size={18} color={COLORS.surfaceWhite} />
+                  <Text style={styles.emptySquadAddBtnText}>Add First Player</Text>
+                </TouchableOpacity>
+              </View>
+            }
             renderItem={({ item, index }) => {
               const isSelected = (
                 activeSquadTab === 'team1' ? team1SelectedPlayerIds : team2SelectedPlayerIds
@@ -1225,7 +1481,7 @@ export default function CreateMatchScreen() {
       ) : null}
 
       {/* ========================================================================= */}
-      {/* STAGE 4: CHOOSE CAPTAIN & WICKET KEEPER (Screenshot 16)                   */}
+      {/* STEP 5: CHOOSE CAPTAIN & WICKET KEEPER (Screenshot 16)                   */}
       {/* ========================================================================= */}
       {currentStage === 'CAPTAIN_WK' ? (
         <View style={styles.stageWrapper}>
@@ -1371,7 +1627,7 @@ export default function CreateMatchScreen() {
       ) : null}
 
       {/* ========================================================================= */}
-      {/* STAGE 5: THE TOSS (Screenshot 17)                                         */}
+      {/* STEP 6: THE TOSS (Screenshot 17)                                         */}
       {/* ========================================================================= */}
       {currentStage === 'TOSS' ? (
         <View style={styles.stageWrapper}>
@@ -1408,7 +1664,7 @@ export default function CreateMatchScreen() {
                   {team1?.name}
                 </Text>
                 <Text style={styles.tossCaptainText}>
-                  Cap: {team1Players.find((p) => p.id === team1CaptainId)?.name || team1?.captainName}
+                  Cap: {team1Players.find((p) => p.id === team1CaptainId)?.name || team1?.captainName || 'Captain'}
                 </Text>
 
                 {tossWinnerTeam === 'team1' ? (
@@ -1441,7 +1697,7 @@ export default function CreateMatchScreen() {
                   {team2?.name}
                 </Text>
                 <Text style={styles.tossCaptainText}>
-                  Cap: {team2Players.find((p) => p.id === team2CaptainId)?.name || team2?.captainName}
+                  Cap: {team2Players.find((p) => p.id === team2CaptainId)?.name || team2?.captainName || 'Captain'}
                 </Text>
 
                 {tossWinnerTeam === 'team2' ? (
@@ -1562,7 +1818,7 @@ export default function CreateMatchScreen() {
       ) : null}
 
       {/* ========================================================================= */}
-      {/* STAGE 6: SELECT OPENERS & OPENING BOWLER (Screenshot 18)                  */}
+      {/* STEP 7: SELECT OPENERS & OPENING BOWLER (Screenshot 18)                  */}
       {/* ========================================================================= */}
       {currentStage === 'OPENERS' ? (
         <View style={styles.stageWrapper}>
@@ -1733,8 +1989,10 @@ export default function CreateMatchScreen() {
           onSelectTeam={(selected) => {
             if (teamPickerMode === 'team1') {
               setTeam1(selected);
+              updateTeamSquadFromTeamItem(selected, 'team1');
             } else {
               setTeam2(selected);
+              updateTeamSquadFromTeamItem(selected, 'team2');
             }
           }}
           onClose={() => setTeamPickerMode(null)}
@@ -1790,9 +2048,13 @@ export default function CreateMatchScreen() {
             if (addPlayerModalTeam === 'team1') {
               setTeam1Players((prev) => [newPlayer, ...prev]);
               setTeam1SelectedPlayerIds((prev) => [newPlayer.id, ...prev]);
+              if (!team1CaptainId) setTeam1CaptainId(newPlayer.id);
+              if (!team1WkId) setTeam1WkId(newPlayer.id);
             } else {
               setTeam2Players((prev) => [newPlayer, ...prev]);
               setTeam2SelectedPlayerIds((prev) => [newPlayer.id, ...prev]);
+              if (!team2CaptainId) setTeam2CaptainId(newPlayer.id);
+              if (!team2WkId) setTeam2WkId(newPlayer.id);
             }
             setAddPlayerModalTeam(null);
           }}
@@ -1800,7 +2062,7 @@ export default function CreateMatchScreen() {
         />
       ) : null}
 
-      {/* 5. Opener Picker Modal (for Stage 6) */}
+      {/* 5. Opener Picker Modal (for Stage 7) */}
       {openerPickerModal ? (
         <Modal
           visible={Boolean(openerPickerModal)}
@@ -1826,6 +2088,13 @@ export default function CreateMatchScreen() {
               <FlatList
                 data={openerPickerModal === 'bowler' ? bowlingPlayers : battingPlayers}
                 keyExtractor={(item) => item.id}
+                ListEmptyComponent={
+                  <View style={{ padding: 24, alignItems: 'center' }}>
+                    <Text style={{ color: COLORS.textMuted, fontSize: FONT_SIZE.sm }}>
+                      No eligible players found in Playing XI.
+                    </Text>
+                  </View>
+                }
                 renderItem={({ item }) => {
                   const isDisabled =
                     (openerPickerModal === 'striker' && item.id === nonStrikerId) ||
@@ -1890,10 +2159,10 @@ const styles = StyleSheet.create({
   },
   headerBackBtn: {
     padding: 6,
+    marginRight: 8,
   },
   headerTitleContainer: {
     flex: 1,
-    marginLeft: 12,
   },
   headerTitleText: {
     color: COLORS.surfaceWhite,
@@ -1951,6 +2220,140 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.xs,
     fontWeight: '600',
     flex: 1,
+  },
+  infoBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0F2F38',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#134E4A',
+    marginBottom: 14,
+    gap: 10,
+  },
+  infoBannerText: {
+    color: '#99F6E4',
+    fontSize: FONT_SIZE.xs,
+    flex: 1,
+    lineHeight: 18,
+  },
+  centerLoadingBox: {
+    paddingVertical: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerLoadingText: {
+    color: COLORS.textMuted,
+    fontSize: FONT_SIZE.sm,
+    marginTop: 12,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginVertical: 12,
+  },
+  emptyTitle: {
+    color: COLORS.surfaceWhite,
+    fontSize: FONT_SIZE.md,
+    fontWeight: FONT_WEIGHT.bold,
+    marginTop: 14,
+  },
+  emptySubtitle: {
+    color: COLORS.textMuted,
+    fontSize: FONT_SIZE.sm,
+    textAlign: 'center',
+    marginTop: 6,
+    marginBottom: 18,
+    lineHeight: 20,
+  },
+  emptyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.brandTeal,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 10,
+    gap: 8,
+  },
+  emptyBtnText: {
+    color: COLORS.surfaceWhite,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+  },
+  teamBadgePill: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  teamBadgePillText: {
+    color: COLORS.surfaceWhite,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  selectTeamPlaceholder: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderStyle: 'dashed',
+    gap: 12,
+  },
+  placeholderTitle: {
+    color: COLORS.surfaceWhite,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+  },
+  placeholderSub: {
+    color: COLORS.textMuted,
+    fontSize: FONT_SIZE.xs,
+    marginTop: 2,
+  },
+  selectedTeamBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#334155',
+    gap: 12,
+  },
+  selectedTeamName: {
+    color: COLORS.surfaceWhite,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+  },
+  selectedTeamSub: {
+    color: COLORS.textMuted,
+    fontSize: FONT_SIZE.xs,
+    marginTop: 2,
+  },
+  selectedTeamPlayerCount: {
+    color: COLORS.brandTeal,
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 3,
+  },
+  changeTeamBtn: {
+    backgroundColor: '#334155',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  changeTeamBtnText: {
+    color: COLORS.surfaceWhite,
+    fontSize: FONT_SIZE.xs,
+    fontWeight: '700',
   },
   matchupBox: {
     backgroundColor: COLORS.card,
@@ -2164,7 +2567,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E293B',
     borderRadius: 12,
     paddingHorizontal: 12,
-    height: 46,
     borderWidth: 1,
     borderColor: '#334155',
     gap: 10,
@@ -2173,6 +2575,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     color: COLORS.surfaceWhite,
+    paddingVertical: 12,
     fontSize: FONT_SIZE.sm,
   },
   bottomBar: {
@@ -2180,67 +2583,34 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#0B1220',
-    paddingHorizontal: 16,
-    paddingTop: 10,
+    backgroundColor: COLORS.card,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
+    paddingHorizontal: 16,
+    paddingTop: 12,
   },
   nextCtaBtn: {
-    backgroundColor: COLORS.brandTeal,
+    backgroundColor: COLORS.brandRed,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
-    paddingVertical: 14,
+    paddingVertical: 16,
     gap: 8,
   },
   nextCtaBtnText: {
     color: COLORS.surfaceWhite,
     fontSize: FONT_SIZE.md,
     fontWeight: FONT_WEIGHT.bold,
-  },
-  infoBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#0F2F38',
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: COLORS.brandTeal,
-    gap: 10,
-    marginBottom: 14,
-  },
-  infoBannerText: {
-    color: COLORS.surfaceLight,
-    fontSize: FONT_SIZE.xs,
-    flex: 1,
-    lineHeight: 18,
+    letterSpacing: 0.5,
   },
   officialSlotLabel: {
     color: COLORS.textMuted,
     fontSize: FONT_SIZE.xs,
-    fontWeight: '600',
+    fontWeight: '700',
+    marginTop: 8,
     marginBottom: 6,
-    marginTop: 4,
-  },
-  addSlotBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#162344',
-    borderRadius: 12,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: '#1E3A8A',
-    borderStyle: 'dashed',
-    gap: 8,
-    marginBottom: 12,
-  },
-  addSlotBtnText: {
-    color: COLORS.brandTeal,
-    fontSize: FONT_SIZE.sm,
-    fontWeight: '600',
+    textTransform: 'uppercase',
   },
   officialPopulatedCard: {
     flexDirection: 'row',
@@ -2248,15 +2618,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E293B',
     borderRadius: 12,
     padding: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: COLORS.brandTeal,
-    gap: 12,
+    marginBottom: 8,
+    gap: 10,
   },
   officialAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: '#334155',
     justifyContent: 'center',
     alignItems: 'center',
@@ -2281,14 +2649,32 @@ const styles = StyleSheet.create({
   },
   selfBadge: {
     backgroundColor: '#0F766E',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 4,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
   },
   selfBadgeText: {
     color: COLORS.surfaceWhite,
     fontSize: 9,
     fontWeight: '800',
+  },
+  addSlotBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderStyle: 'dashed',
+    gap: 8,
+    marginBottom: 8,
+  },
+  addSlotBtnText: {
+    color: COLORS.brandTeal,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: '600',
   },
   teamTabsHeader: {
     flexDirection: 'row',
@@ -2302,52 +2688,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
-    gap: 8,
+    paddingHorizontal: 12,
     borderBottomWidth: 3,
     borderBottomColor: 'transparent',
+    gap: 8,
   },
   teamTabBtnActive: {
     borderBottomColor: COLORS.brandTeal,
-    backgroundColor: '#13283E',
+    backgroundColor: '#1E293B',
   },
   teamTabBtnText: {
     color: COLORS.textMuted,
     fontSize: FONT_SIZE.sm,
     fontWeight: '600',
-    maxWidth: '70%',
   },
   teamTabBtnTextActive: {
     color: COLORS.surfaceWhite,
     fontWeight: FONT_WEIGHT.bold,
   },
   countBadge: {
-    backgroundColor: '#1E293B',
-    borderRadius: 10,
-    paddingHorizontal: 6,
+    backgroundColor: '#334155',
+    paddingHorizontal: 8,
     paddingVertical: 2,
+    borderRadius: 10,
   },
   countBadgeText: {
     color: COLORS.brandTeal,
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '700',
   },
   squadAlertNotice: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#0F2F38',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    padding: 10,
     gap: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#134E4A',
   },
   squadAlertText: {
-    color: COLORS.surfaceLight,
+    color: '#99F6E4',
     fontSize: FONT_SIZE.xs,
-    fontWeight: '600',
     flex: 1,
+    fontWeight: '500',
   },
   squadToolsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
     gap: 10,
@@ -2356,18 +2742,18 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    backgroundColor: '#1E293B',
     borderRadius: 10,
-    paddingHorizontal: 10,
-    height: 40,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    gap: 6,
+    borderColor: '#334155',
+    gap: 8,
   },
   squadSearchInput: {
     flex: 1,
     color: COLORS.surfaceWhite,
-    fontSize: FONT_SIZE.xs,
+    paddingVertical: 8,
+    fontSize: FONT_SIZE.sm,
   },
   quickAddPlayerBtn: {
     flexDirection: 'row',
@@ -2375,7 +2761,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.brandTeal,
     borderRadius: 10,
     paddingHorizontal: 12,
-    height: 40,
     gap: 6,
   },
   quickAddPlayerText: {
@@ -2388,7 +2773,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingVertical: 6,
+    marginBottom: 4,
   },
   selectCountInfo: {
     color: COLORS.textMuted,
@@ -2402,6 +2788,44 @@ const styles = StyleSheet.create({
   squadListContent: {
     paddingHorizontal: 16,
     paddingTop: 4,
+  },
+  emptySquadContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: COLORS.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginVertical: 12,
+  },
+  emptySquadTitle: {
+    color: COLORS.surfaceWhite,
+    fontSize: FONT_SIZE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+    marginTop: 10,
+  },
+  emptySquadSub: {
+    color: COLORS.textMuted,
+    fontSize: FONT_SIZE.xs,
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: 16,
+    lineHeight: 18,
+  },
+  emptySquadAddBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.brandTeal,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  emptySquadAddBtnText: {
+    color: COLORS.surfaceWhite,
+    fontSize: FONT_SIZE.xs,
+    fontWeight: '700',
   },
   playerSelectCard: {
     flexDirection: 'row',
@@ -2499,8 +2923,8 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
   },
   goldBadgeText: {
-    color: '#000000',
-    fontSize: 10,
+    color: COLORS.surfaceWhite,
+    fontSize: 9,
     fontWeight: '900',
   },
   tealBadge: {
@@ -2511,12 +2935,11 @@ const styles = StyleSheet.create({
   },
   tealBadgeText: {
     color: COLORS.surfaceWhite,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
   },
   capWkToggleGroup: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 8,
   },
   capToggleBtn: {
@@ -2524,10 +2947,10 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#475569',
   },
   capToggleBtnActive: {
     backgroundColor: '#F59E0B',
@@ -2539,17 +2962,17 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   capToggleTextActive: {
-    color: '#000000',
+    color: COLORS.surfaceWhite,
   },
   wkToggleBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#475569',
   },
   wkToggleBtnActive: {
     backgroundColor: COLORS.brandTeal,
@@ -2564,7 +2987,8 @@ const styles = StyleSheet.create({
     color: COLORS.surfaceWhite,
   },
   tossHeaderBox: {
-    marginBottom: 16,
+    alignItems: 'center',
+    paddingVertical: 16,
   },
   tossSectionQuestion: {
     color: COLORS.surfaceWhite,
@@ -2575,11 +2999,12 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     fontSize: FONT_SIZE.xs,
     marginTop: 4,
+    textAlign: 'center',
   },
   tossTeamsRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 18,
+    marginVertical: 12,
   },
   tossTeamCard: {
     flex: 1,
@@ -2600,7 +3025,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   tossAvatarText: {
     color: COLORS.surfaceWhite,
@@ -2616,18 +3041,18 @@ const styles = StyleSheet.create({
   },
   tossCaptainText: {
     color: COLORS.textMuted,
-    fontSize: FONT_SIZE.xs,
-    marginTop: 4,
+    fontSize: 11,
+    marginTop: 2,
     textAlign: 'center',
   },
   tossWinnerPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F766E',
-    borderRadius: 12,
+    backgroundColor: COLORS.brandTeal,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    marginTop: 12,
+    borderRadius: 12,
+    marginTop: 10,
     gap: 4,
   },
   tossWinnerPillText: {
@@ -2636,58 +3061,61 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   tossTapSelectBox: {
-    marginTop: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    marginTop: 10,
   },
   tossTapSelectText: {
     color: COLORS.textMuted,
-    fontSize: FONT_SIZE.xs,
+    fontSize: 10,
+    fontWeight: '600',
   },
   coinFlipContainer: {
     alignItems: 'center',
-    marginVertical: 12,
+    marginVertical: 14,
   },
   coinFlipBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1E293B',
-    borderRadius: 20,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#334155',
+    backgroundColor: '#334155',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 14,
     gap: 8,
   },
   coinFlipBtnText: {
     color: COLORS.surfaceWhite,
-    fontSize: FONT_SIZE.xs,
+    fontSize: FONT_SIZE.sm,
     fontWeight: '700',
   },
   coinTossResultText: {
     color: '#F59E0B',
-    fontSize: FONT_SIZE.xs,
+    fontSize: FONT_SIZE.sm,
     fontWeight: '700',
     marginTop: 8,
     textAlign: 'center',
   },
   decisionContainer: {
-    marginTop: 10,
+    marginTop: 12,
+    alignItems: 'center',
   },
   decisionButtonsRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 12,
+    gap: 14,
+    marginTop: 14,
+    width: '100%',
   },
   decisionBtn: {
     flex: 1,
     backgroundColor: COLORS.card,
     borderRadius: 16,
-    padding: 18,
-    alignItems: 'center',
     borderWidth: 2,
     borderColor: COLORS.border,
-    gap: 8,
+    paddingVertical: 20,
+    alignItems: 'center',
+    gap: 6,
   },
   decisionBtnActive: {
     borderColor: COLORS.brandTeal,
@@ -2695,8 +3123,8 @@ const styles = StyleSheet.create({
   },
   decisionBtnTitle: {
     color: COLORS.textMuted,
-    fontSize: FONT_SIZE.lg,
-    fontWeight: FONT_WEIGHT.bold,
+    fontSize: FONT_SIZE.md,
+    fontWeight: '800',
   },
   decisionBtnTitleActive: {
     color: COLORS.surfaceWhite,
