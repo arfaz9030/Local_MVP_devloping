@@ -587,6 +587,8 @@ export const TeamsScreen: React.FC = () => {
           visible={inviteModalVisible}
           teamId={selectedTeamForInvite.id}
           teamName={selectedTeamForInvite.name}
+          captainName={selectedTeamForInvite.captainName}
+          city={selectedTeamForInvite.city}
           onClose={() => setInviteModalVisible(false)}
           onPlayerAdded={handlePlayerAdded}
         />

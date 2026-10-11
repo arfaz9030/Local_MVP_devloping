@@ -1,26 +1,33 @@
+import * as Contacts from 'expo-contacts';
 import React, { useState } from 'react';
 import {
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Share,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as Contacts from 'expo-contacts';
 import { Icon } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { addPlayer, AddPlayerPayload } from '../src/api/matchApi';
 import { COLORS } from '../src/theme/color';
 import { FONT_SIZE, FONT_WEIGHT } from '../src/theme/typography';
+import { TeamQRModal } from './TeamQRModal';
 
 interface InvitePlayerModalProps {
   visible: boolean;
   teamId: string | number;
   teamName: string;
+  captainName?: string;
+  city?: string;
   onClose: () => void;
   onPlayerAdded: (newPlayer: any) => void;
 }
@@ -32,13 +39,30 @@ const PLAYER_ROLES = [
   'Wicketkeeper',
 ];
 
+const BATTING_STYLES = ['Right-hand bat', 'Left-hand bat'];
+const BOWLING_STYLES = [
+  'Right-arm fast',
+  'Right-arm medium',
+  'Right-arm spin',
+  'Left-arm fast',
+  'Left-arm spin',
+  'None',
+];
+
 export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
   visible,
   teamId,
   teamName,
+  captainName,
+  city,
   onClose,
   onPlayerAdded,
 }) => {
+  const insets = useSafeAreaInsets();
+  const statusBarHeight = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0;
+  const topInset = Math.max(insets.top, statusBarHeight);
+  const bottomInset = insets.bottom;
+
   const [playerName, setPlayerName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [jerseyNumber, setJerseyNumber] = useState('');
@@ -47,6 +71,7 @@ export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
   const [bowlingStyle, setBowlingStyle] = useState('Right-arm medium');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [qrModalVisible, setQrModalVisible] = useState(false);
 
   const handleShareTeamLink = async () => {
     try {
@@ -91,7 +116,6 @@ export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
         Alert.alert('Contacts', 'Native contact picker is not supported on this platform.');
       }
     } catch (err: any) {
-      // User cancelled picker or system error
       if (err?.message && !err.message.toLowerCase().includes('cancel')) {
         Alert.alert('Contacts Error', 'Could not open device contact picker.');
       }
@@ -105,22 +129,28 @@ export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
       return;
     }
 
+    const numericTeamId = Number(teamId);
+    if (!numericTeamId || Number.isNaN(numericTeamId)) {
+      setError('Valid team ID is required to add player.');
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
 
       const payload: AddPlayerPayload = {
         name: trimmedName,
-        teamId: Number(teamId),
+        teamId: numericTeamId,
         mobileNumber: mobileNumber.trim() || undefined,
         jerseyNumber: jerseyNumber ? Number(jerseyNumber) : undefined,
         role: selectedRole,
         battingStyle,
-        bowlingStyle,
+        bowlingStyle: bowlingStyle === 'None' ? undefined : bowlingStyle,
       };
 
       try {
-        const savedPlayer = await addPlayer(Number(teamId), payload);
+        const savedPlayer = await addPlayer(numericTeamId, payload);
         console.log('SAVED PLAYER FROM API:', savedPlayer);
         onPlayerAdded(savedPlayer);
       } catch (apiErr: any) {
@@ -128,11 +158,13 @@ export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
         return;
       }
 
-      // Reset form
+      // Reset form on success
       setPlayerName('');
       setMobileNumber('');
       setJerseyNumber('');
       setSelectedRole('All-Rounder');
+      setBattingStyle('Right-hand bat');
+      setBowlingStyle('Right-arm medium');
       onClose();
     } catch (e: any) {
       setError(e.message || 'Failed to add player.');
@@ -141,178 +173,296 @@ export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
     }
   };
 
+  const handleResetAndClose = () => {
+    setPlayerName('');
+    setMobileNumber('');
+    setJerseyNumber('');
+    setError('');
+    onClose();
+  };
+
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.headerTitleContainer}>
-              <Icon source="account-plus" size={24} color={COLORS.brandTeal} />
-              <Text style={styles.headerTitle}>Invite Player</Text>
+    <>
+      <Modal
+        visible={visible}
+        transparent
+        animationType="slide"
+        onRequestClose={handleResetAndClose}
+      >
+        <View style={styles.modalOverlay}>
+          <Pressable style={styles.backdrop} onPress={handleResetAndClose} />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={styles.keyboardAvoid}
+          >
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  marginTop: topInset + 10,
+                  paddingBottom: Math.max(bottomInset, 16) + 8,
+                },
+              ]}
+            >
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={styles.headerTitleContainer}>
+                  <Icon source="account-plus" size={24} color={COLORS.brandTeal} />
+                  <Text style={styles.headerTitle}>Add Player to Roster</Text>
+                </View>
+                <TouchableOpacity onPress={handleResetAndClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                  <Icon source="close" size={24} color={COLORS.textDarkSecondary} />
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.subTitle}>Adding player to {teamName}</Text>
+
+              {/* Quick Action Buttons Row: Share Link, From Contacts, Team QR */}
+              <View style={styles.quickActionsContainer}>
+                <TouchableOpacity
+                  style={styles.shareLinkButton}
+                  onPress={handleShareTeamLink}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.shareLinkIconWrapper}>
+                    <Icon source="share-variant" size={16} color={COLORS.brandTeal} />
+                  </View>
+                  <View style={styles.shareLinkTextWrapper}>
+                    <Text style={styles.shareLinkTitle}>Share Link</Text>
+                    <Text style={styles.shareLinkSubtitle}>Share sheet</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.contactsButton}
+                  onPress={handlePickContact}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.contactsIconWrapper}>
+                    <Icon source="contacts" size={16} color="#2563EB" />
+                  </View>
+                  <View style={styles.shareLinkTextWrapper}>
+                    <Text style={styles.shareLinkTitle}>Contacts</Text>
+                    <Text style={styles.shareLinkSubtitle}>Import</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.qrButton}
+                  onPress={() => setQrModalVisible(true)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.qrIconWrapper}>
+                    <Icon source="qrcode-scan" size={16} color="#7C3AED" />
+                  </View>
+                  <View style={styles.shareLinkTextWrapper}>
+                    <Text style={styles.shareLinkTitle}>Team QR</Text>
+                    <Text style={styles.shareLinkSubtitle}>View QR</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              {/* Divider */}
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>OR ADD MANUALLY</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              <ScrollView
+                style={styles.formScroll}
+                contentContainerStyle={{ paddingBottom: 12 }}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
+                {/* Player Name */}
+                <Text style={styles.inputLabel}>Player Name *</Text>
+                <TextInput
+                  style={[styles.input, error && !playerName.trim() ? styles.inputError : null]}
+                  placeholder="e.g. Virat Kohli"
+                  placeholderTextColor={COLORS.placeholder}
+                  value={playerName}
+                  onChangeText={(text) => {
+                    setPlayerName(text);
+                    if (error) setError('');
+                  }}
+                  autoCapitalize="words"
+                />
+                {error && !playerName.trim() ? (
+                  <Text style={styles.errorText}>{error}</Text>
+                ) : null}
+
+                {/* Mobile Number */}
+                <Text style={styles.inputLabel}>Mobile Number (optional)</Text>
+                <View style={styles.phoneInputRow}>
+                  <Text style={styles.phonePrefix}>+91</Text>
+                  <TextInput
+                    style={styles.phoneInput}
+                    placeholder="10 digit mobile number"
+                    placeholderTextColor={COLORS.placeholder}
+                    value={mobileNumber}
+                    onChangeText={setMobileNumber}
+                    keyboardType="phone-pad"
+                    maxLength={10}
+                  />
+                </View>
+
+                {/* Jersey Number */}
+                <Text style={styles.inputLabel}>Jersey Number (optional)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. 18"
+                  placeholderTextColor={COLORS.placeholder}
+                  value={jerseyNumber}
+                  onChangeText={setJerseyNumber}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                />
+
+                {/* Role Selection */}
+                <Text style={styles.inputLabel}>Playing Role</Text>
+                <View style={styles.rolesRow}>
+                  {PLAYER_ROLES.map((role) => {
+                    const isSelected = selectedRole === role;
+                    return (
+                      <Pressable
+                        key={role}
+                        style={[
+                          styles.roleChip,
+                          isSelected ? styles.roleChipSelected : null,
+                        ]}
+                        onPress={() => setSelectedRole(role)}
+                      >
+                        <Text
+                          style={[
+                            styles.roleChipText,
+                            isSelected ? styles.roleChipTextSelected : null,
+                          ]}
+                        >
+                          {role}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                {/* Batting Style */}
+                <Text style={styles.inputLabel}>Batting Style</Text>
+                <View style={styles.rolesRow}>
+                  {BATTING_STYLES.map((style) => {
+                    const isSelected = battingStyle === style;
+                    return (
+                      <Pressable
+                        key={style}
+                        style={[
+                          styles.roleChip,
+                          isSelected ? styles.roleChipSelected : null,
+                        ]}
+                        onPress={() => setBattingStyle(style)}
+                      >
+                        <Text
+                          style={[
+                            styles.roleChipText,
+                            isSelected ? styles.roleChipTextSelected : null,
+                          ]}
+                        >
+                          {style}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                {/* Bowling Style */}
+                <Text style={styles.inputLabel}>Bowling Style</Text>
+                <View style={styles.rolesRow}>
+                  {BOWLING_STYLES.map((style) => {
+                    const isSelected = bowlingStyle === style;
+                    return (
+                      <Pressable
+                        key={style}
+                        style={[
+                          styles.roleChip,
+                          isSelected ? styles.roleChipSelected : null,
+                        ]}
+                        onPress={() => setBowlingStyle(style)}
+                      >
+                        <Text
+                          style={[
+                            styles.roleChipText,
+                            isSelected ? styles.roleChipTextSelected : null,
+                          ]}
+                        >
+                          {style}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+
+              {/* Action Buttons */}
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={handleResetAndClose}
+                  disabled={loading}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.submitButton, loading ? styles.buttonDisabled : null]}
+                  onPress={handleAddPlayer}
+                  disabled={loading}
+                >
+                  <Text style={styles.submitButtonText}>
+                    {loading ? 'Adding...' : 'Add Player'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Icon source="close" size={24} color={COLORS.textDarkSecondary} />
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.subTitle}>Adding player to {teamName}</Text>
-
-          {/* Quick Action Buttons Row: Share Team Link & Pick from Contacts */}
-          <View style={styles.quickActionsContainer}>
-            <TouchableOpacity
-              style={styles.shareLinkButton}
-              onPress={handleShareTeamLink}
-              activeOpacity={0.7}
-            >
-              <View style={styles.shareLinkIconWrapper}>
-                <Icon source="share-variant" size={18} color={COLORS.brandTeal} />
-              </View>
-              <View style={styles.shareLinkTextWrapper}>
-                <Text style={styles.shareLinkTitle}>Share Team Link</Text>
-                <Text style={styles.shareLinkSubtitle}>Native share sheet</Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.contactsButton}
-              onPress={handlePickContact}
-              activeOpacity={0.7}
-            >
-              <View style={styles.contactsIconWrapper}>
-                <Icon source="contacts" size={18} color="#2563EB" />
-              </View>
-              <View style={styles.shareLinkTextWrapper}>
-                <Text style={styles.shareLinkTitle}>From Contacts</Text>
-                <Text style={styles.shareLinkSubtitle}>Select device contact</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {/* Divider */}
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR ADD MANUALLY</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          <ScrollView style={styles.formScroll} showsVerticalScrollIndicator={false}>
-            {/* Player Name */}
-            <Text style={styles.inputLabel}>Player Name *</Text>
-            <TextInput
-              style={[styles.input, error && !playerName.trim() ? styles.inputError : null]}
-              placeholder="e.g. Virat Kohli"
-              placeholderTextColor={COLORS.placeholder}
-              value={playerName}
-              onChangeText={(text) => {
-                setPlayerName(text);
-                if (error) setError('');
-              }}
-              autoCapitalize="words"
-            />
-            {error && !playerName.trim() ? (
-              <Text style={styles.errorText}>{error}</Text>
-            ) : null}
-
-            {/* Mobile Number */}
-            <Text style={styles.inputLabel}>Mobile Number (optional)</Text>
-            <View style={styles.phoneInputRow}>
-              <Text style={styles.phonePrefix}>+91</Text>
-              <TextInput
-                style={styles.phoneInput}
-                placeholder="10 digit mobile number"
-                placeholderTextColor={COLORS.placeholder}
-                value={mobileNumber}
-                onChangeText={setMobileNumber}
-                keyboardType="phone-pad"
-                maxLength={10}
-              />
-            </View>
-
-            {/* Jersey Number */}
-            <Text style={styles.inputLabel}>Jersey Number (optional)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. 18"
-              placeholderTextColor={COLORS.placeholder}
-              value={jerseyNumber}
-              onChangeText={setJerseyNumber}
-              keyboardType="number-pad"
-              maxLength={3}
-            />
-
-            {/* Role Selection */}
-            <Text style={styles.inputLabel}>Playing Role</Text>
-            <View style={styles.rolesRow}>
-              {PLAYER_ROLES.map((role) => {
-                const isSelected = selectedRole === role;
-                return (
-                  <Pressable
-                    key={role}
-                    style={[
-                      styles.roleChip,
-                      isSelected ? styles.roleChipSelected : null,
-                    ]}
-                    onPress={() => setSelectedRole(role)}
-                  >
-                    <Text
-                      style={[
-                        styles.roleChipText,
-                        isSelected ? styles.roleChipTextSelected : null,
-                      ]}
-                    >
-                      {role}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </ScrollView>
-
-          {/* Action Buttons */}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={onClose}
-              disabled={loading}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.submitButton, loading ? styles.buttonDisabled : null]}
-              onPress={handleAddPlayer}
-              disabled={loading}
-            >
-              <Text style={styles.submitButtonText}>
-                {loading ? 'Adding...' : 'Add Player'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          </KeyboardAvoidingView>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+
+      {/* Team QR Modal */}
+      {qrModalVisible ? (
+        <TeamQRModal
+          visible={qrModalVisible}
+          team={{
+            id: String(teamId),
+            name: teamName,
+            captainName: captainName || 'Team Captain',
+            city: city || 'Hyderabad (Telangana)',
+            players: [],
+          }}
+          onClose={() => setQrModalVisible(false)}
+        />
+      ) : null}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    justifyContent: 'flex-end',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  keyboardAvoid: {
+    width: '100%',
     justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: COLORS.surfaceWhite,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 28,
-    maxHeight: '85%',
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    maxHeight: '90%',
   },
   header: {
     flexDirection: 'row',
@@ -337,7 +487,7 @@ const styles = StyleSheet.create({
   },
   quickActionsContainer: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
     marginBottom: 10,
   },
   shareLinkButton: {
@@ -348,7 +498,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#CCFBF1',
     borderRadius: 10,
-    padding: 10,
+    padding: 8,
   },
   contactsButton: {
     flex: 1,
@@ -358,36 +508,55 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#DBEAFE',
     borderRadius: 10,
-    padding: 10,
+    padding: 8,
+  },
+  qrButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FAF5FF',
+    borderWidth: 1,
+    borderColor: '#F3E8FF',
+    borderRadius: 10,
+    padding: 8,
   },
   shareLinkIconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: '#CCFBF1',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: 6,
   },
   contactsIconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: 6,
+  },
+  qrIconWrapper: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F3E8FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 6,
   },
   shareLinkTextWrapper: {
     flex: 1,
   },
   shareLinkTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: FONT_WEIGHT.bold,
     color: COLORS.textDark,
   },
   shareLinkSubtitle: {
-    fontSize: 10,
+    fontSize: 9,
     color: COLORS.textDarkSecondary,
     marginTop: 1,
   },

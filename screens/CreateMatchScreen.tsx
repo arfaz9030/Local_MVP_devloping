@@ -18,7 +18,7 @@ import {
 import { Icon } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddOfficialModal, OfficialMember, OfficialRole } from '../components/AddOfficialModal';
-import { AddSquadPlayerModal } from '../components/AddSquadPlayerModal';
+import { InvitePlayerModal } from '../components/InvitePlayerModal';
 import { GroundPickerModal } from '../components/GroundPickerModal';
 import { TeamItem } from '../components/TeamCard';
 import { TeamPickerModal } from '../components/TeamPickerModal';
@@ -2090,26 +2090,68 @@ export default function CreateMatchScreen() {
         />
       ) : null}
 
-      {/* 4. Add Squad Player Modal (Screenshot 12) */}
+      {/* 4. Unified Add Roster / Invite Player Modal (Reused from Create Team / Team Management) */}
       {addPlayerModalTeam ? (
-        <AddSquadPlayerModal
+        <InvitePlayerModal
           visible={Boolean(addPlayerModalTeam)}
+          teamId={addPlayerModalTeam === 'team1' ? team1?.id || '' : team2?.id || ''}
           teamName={addPlayerModalTeam === 'team1' ? team1?.name || 'Team 1' : team2?.name || 'Team 2'}
-          onAddPlayer={(newPlayer) => {
+          captainName={addPlayerModalTeam === 'team1' ? team1?.captainName : team2?.captainName}
+          city={addPlayerModalTeam === 'team1' ? team1?.city : team2?.city}
+          onClose={() => setAddPlayerModalTeam(null)}
+          onPlayerAdded={(savedPlayer) => {
+            const formattedPlayer: SquadPlayer = {
+              id: String(savedPlayer.id),
+              name: savedPlayer.name,
+              jerseyNumber: savedPlayer.jerseyNumber,
+              role: savedPlayer.role || 'All-Rounder',
+              battingStyle: savedPlayer.battingStyle || 'Right Hand Bat',
+              bowlingStyle: savedPlayer.bowlingStyle || 'Right-arm Medium',
+            };
+
             if (addPlayerModalTeam === 'team1') {
-              setTeam1Players((prev) => [newPlayer, ...prev]);
-              setTeam1SelectedPlayerIds((prev) => [newPlayer.id, ...prev]);
-              if (!team1CaptainId) setTeam1CaptainId(newPlayer.id);
-              if (!team1WkId) setTeam1WkId(newPlayer.id);
+              setTeam1Players((prev) => {
+                if (prev.some((p) => p.id === formattedPlayer.id)) return prev;
+                return [...prev, formattedPlayer];
+              });
+              // Do NOT automatically select the player for Playing XI.
+              // Preserves all existing Playing XI selections for both teams.
             } else {
-              setTeam2Players((prev) => [newPlayer, ...prev]);
-              setTeam2SelectedPlayerIds((prev) => [newPlayer.id, ...prev]);
-              if (!team2CaptainId) setTeam2CaptainId(newPlayer.id);
-              if (!team2WkId) setTeam2WkId(newPlayer.id);
+              setTeam2Players((prev) => {
+                if (prev.some((p) => p.id === formattedPlayer.id)) return prev;
+                return [...prev, formattedPlayer];
+              });
+              // Do NOT automatically select the player for Playing XI.
+              // Preserves all existing Playing XI selections for both teams.
             }
+
+            // Also update the team's cached roster in the loaded teams list
+            const currentTargetTeamId = addPlayerModalTeam === 'team1' ? team1?.id : team2?.id;
+            if (currentTargetTeamId) {
+              setTeams((prevTeams) =>
+                prevTeams.map((t) => {
+                  if (t.id === currentTargetTeamId) {
+                    if (t.players.some((p) => p.id === formattedPlayer.id)) return t;
+                    return {
+                      ...t,
+                      players: [
+                        ...t.players,
+                        {
+                          id: formattedPlayer.id,
+                          name: formattedPlayer.name,
+                          jerseyNumber: formattedPlayer.jerseyNumber,
+                          role: formattedPlayer.role,
+                        },
+                      ],
+                    };
+                  }
+                  return t;
+                })
+              );
+            }
+
             setAddPlayerModalTeam(null);
           }}
-          onClose={() => setAddPlayerModalTeam(null)}
         />
       ) : null}
 
