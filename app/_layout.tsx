@@ -95,6 +95,13 @@ export default function RootLayout() {
             }}
           >
             <Stack.Screen
+              name="index"
+              options={{
+                headerShown: false,
+              }}
+            />
+
+            <Stack.Screen
               name="onboarding"
               options={{
                 headerShown: false,
@@ -122,6 +129,31 @@ export default function RootLayout() {
               name="match/[matchId]"
               options={{
                 title: 'Match Detail',
+                headerShown: true,
+              }}
+            />
+
+            <Stack.Screen
+              name="add-score/[matchId]"
+              options={{
+                headerShown: false,
+                title: 'Update Score',
+              }}
+            />
+
+            <Stack.Screen
+              name="share-score/[matchId]"
+              options={{
+                headerShown: false,
+                title: 'Share Score',
+              }}
+            />
+
+            <Stack.Screen
+              name="modal"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
               }}
             />
           </Stack>

@@ -1,3 +1,4 @@
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -26,12 +27,17 @@ import { FONT_SIZE, FONT_WEIGHT } from '../src/theme/typography';
 type TabType = 'your_teams' | 'opponents' | 'add';
 
 export const TeamsScreen: React.FC = () => {
+  const router = useRouter();
+  const routeParams = useLocalSearchParams<{ source?: string; targetTeam?: string }>();
+  const isFromStartMatch = routeParams.source === 'start_match';
+  const targetTeam = (routeParams.targetTeam as 'team1' | 'team2') || 'team1';
+
   const insets = useSafeAreaInsets();
   const statusBarHeight = Platform.OS === 'android' ? (StatusBar.currentHeight || 0) : 0;
   const topInset = Math.max(insets.top, statusBarHeight);
 
   // Navigation & Tabs
-  const [activeTab, setActiveTab] = useState<TabType>('your_teams');
+  const [activeTab, setActiveTab] = useState<TabType>(isFromStartMatch ? 'add' : 'your_teams');
   const [searchQuery, setSearchQuery] = useState('');
   const [drawerVisible, setDrawerVisible] = useState(false);
 
@@ -82,31 +88,8 @@ export const TeamsScreen: React.FC = () => {
         }))
       );
     } catch (e: any) {
-      setError('Could not load teams from server.');
-      // If server is not responding, keep local initial demo data if empty
-      if (teams.length === 0) {
-        setTeams([
-          {
-            id: '1',
-            name: 'Hyderabad Nizampet Boys',
-            captainName: 'MohammadArfaz Shaik',
-            city: 'Hyderabad (Telangana)',
-            players: [
-              { id: 'p1', name: 'MohammadArfaz Shaik', jerseyNumber: 7, role: 'All-Rounder' },
-              { id: 'p2', name: 'Rahul Sharma', jerseyNumber: 18, role: 'Batsman' },
-            ],
-          },
-          {
-            id: '2',
-            name: 'Hyderabad Tolichowki Boys',
-            captainName: 'Ahmed Khan',
-            city: 'Hyderabad (Telangana)',
-            players: [
-              { id: 'p3', name: 'Ahmed Khan', jerseyNumber: 10, role: 'Bowler' },
-            ],
-          },
-        ]);
-      }
+      setError(e?.message || 'Could not load teams from server.');
+      setTeams([]);
     } finally {
       setLoading(false);
     }
@@ -115,6 +98,12 @@ export const TeamsScreen: React.FC = () => {
   useEffect(() => {
     loadTeams();
   }, []);
+
+  useEffect(() => {
+    if (isFromStartMatch) {
+      setActiveTab('add');
+    }
+  }, [isFromStartMatch]);
 
   // Handle Team Creation
   const handleAddTeam = async () => {
@@ -170,9 +159,41 @@ export const TeamsScreen: React.FC = () => {
       setCaptainName('');
       setAddSelf(false);
 
-      // Switch to your teams tab
-      setActiveTab('your_teams');
-      Alert.alert('Team Created', `${trimmedTeamName} has been added successfully!`);
+      if (isFromStartMatch) {
+        Alert.alert(
+          'Team Created',
+          `${trimmedTeamName} has been created successfully! Returning to match setup...`,
+          [
+            {
+              text: 'Continue',
+              onPress: () => {
+                router.replace({
+                  pathname: '/create-match',
+                  params: {
+                    createdTeamId: String(response.id),
+                    targetTeam: targetTeam,
+                    refresh: Date.now().toString(),
+                  },
+                });
+              },
+            },
+          ]
+        );
+        setTimeout(() => {
+          router.replace({
+            pathname: '/create-match',
+            params: {
+              createdTeamId: String(response.id),
+              targetTeam: targetTeam,
+              refresh: Date.now().toString(),
+            },
+          });
+        }, 500);
+      } else {
+        // Switch to your teams tab for normal flow outside Start Match
+        setActiveTab('your_teams');
+        Alert.alert('Team Created', `${trimmedTeamName} has been added successfully!`);
+      }
     } catch (err: any) {
       const errorMsg = err?.message || 'Failed to create team. Please try again.';
       setFormError(errorMsg);
@@ -220,10 +241,16 @@ export const TeamsScreen: React.FC = () => {
       {/* Red Top Header */}
       <View style={[styles.topHeader, { paddingTop: topInset + 10 }]}>
         <View style={styles.headerLeft}>
-          {activeTab === 'add' ? (
+          {activeTab === 'add' || isFromStartMatch ? (
             <TouchableOpacity
               style={styles.iconBtn}
-              onPress={() => setActiveTab('your_teams')}
+              onPress={() => {
+                if (isFromStartMatch) {
+                  router.back();
+                } else {
+                  setActiveTab('your_teams');
+                }
+              }}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <Icon source="arrow-left" size={24} color={COLORS.surfaceWhite} />
@@ -248,16 +275,10 @@ export const TeamsScreen: React.FC = () => {
             onPress={() => {
               if (teams.length > 0) {
                 setQrModalTeam(teams[0]);
+                setQrModalVisible(true);
               } else {
-                setQrModalTeam({
-                  id: '1',
-                  name: 'Hyderabad Nizampet Boys',
-                  captainName: 'MohammadArfaz Shaik',
-                  city: 'Hyderabad (Telangana)',
-                  players: [],
-                });
+                Alert.alert('No Teams', 'Please create a team first to view QR code.');
               }
-              setQrModalVisible(true);
             }}
           >
             <Icon source="qrcode-scan" size={22} color={COLORS.surfaceWhite} />

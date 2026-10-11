@@ -30,6 +30,7 @@ interface TeamPickerModalProps {
   disabledTeamId?: string;
   onSelectTeam: (team: SelectedTeamInfo) => void;
   onClose: () => void;
+  onCreateNewTeam?: () => void;
 }
 
 const AVATAR_COLORS = [
@@ -67,6 +68,7 @@ export const TeamPickerModal: React.FC<TeamPickerModalProps> = ({
   disabledTeamId,
   onSelectTeam,
   onClose,
+  onCreateNewTeam,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [customName, setCustomName] = useState('');
@@ -127,6 +129,20 @@ export const TeamPickerModal: React.FC<TeamPickerModalProps> = ({
             </TouchableOpacity>
           </View>
 
+          {/* Create Team Quick Action */}
+          {onCreateNewTeam ? (
+            <TouchableOpacity
+              style={styles.createTeamBtn}
+              onPress={() => {
+                onClose();
+                onCreateNewTeam();
+              }}
+            >
+              <Icon source="plus-circle-outline" size={20} color={COLORS.brandTeal} />
+              <Text style={styles.createTeamBtnText}>Create New Team in CrickHero</Text>
+            </TouchableOpacity>
+          ) : null}
+
           {/* Search Box */}
           <View style={styles.searchBox}>
             <Icon source="magnify" size={20} color={COLORS.textDarkSecondary} />
@@ -155,9 +171,22 @@ export const TeamPickerModal: React.FC<TeamPickerModalProps> = ({
               <View style={styles.emptyContainer}>
                 <Icon source="account-group-outline" size={40} color={COLORS.textDarkSecondary} />
                 <Text style={styles.emptyText}>No matching teams found</Text>
-                <Text style={styles.emptySubText}>
-                  Select or enter a custom team name below
-                </Text>
+                {onCreateNewTeam ? (
+                  <TouchableOpacity
+                    style={styles.emptyCreateBtn}
+                    onPress={() => {
+                      onClose();
+                      onCreateNewTeam();
+                    }}
+                  >
+                    <Icon source="plus" size={16} color="#FFFFFF" />
+                    <Text style={styles.emptyCreateBtnText}>Create Team</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={styles.emptySubText}>
+                    Select or enter a custom team name below
+                  </Text>
+                )}
               </View>
             }
             renderItem={({ item }) => {
@@ -259,6 +288,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
+  },
+  createTeamBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    gap: 8,
+  },
+  createTeamBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.brandTeal,
+  },
+  emptyCreateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.brandTeal,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 10,
+    gap: 6,
+  },
+  emptyCreateBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
   },
   headerTitle: {
     fontSize: FONT_SIZE.lg,

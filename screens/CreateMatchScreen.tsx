@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -56,6 +56,11 @@ export default function CreateMatchScreen() {
   const topInset = Math.max(insets.top, statusBarHeight);
   const bottomInset = insets.bottom;
   const router = useRouter();
+  const routeParams = useLocalSearchParams<{
+    createdTeamId?: string;
+    targetTeam?: string;
+    refresh?: string;
+  }>();
 
   // Current stage in the flow: Starts strictly with TEAM_SELECT
   const [currentStage, setCurrentStage] = useState<MatchSetupStage>('TEAM_SELECT');
@@ -140,7 +145,7 @@ export default function CreateMatchScreen() {
   }, [selectedOvers]);
 
   // Load backend teams - strictly real data, no synthetic fallback
-  const fetchTeamsList = async () => {
+  const fetchTeamsList = async (autoSelectId?: string, autoSelectTarget?: 'team1' | 'team2') => {
     try {
       setLoadingTeams(true);
       setTeamsError('');
@@ -163,6 +168,29 @@ export default function CreateMatchScreen() {
             : [],
         }));
         setTeams(formattedTeams);
+
+        // Auto-select newly created team if provided
+        const targetId = autoSelectId || routeParams.createdTeamId;
+        const targetSide = autoSelectTarget || (routeParams.targetTeam as 'team1' | 'team2') || (team1 ? 'team2' : 'team1');
+
+        if (targetId) {
+          const matched = formattedTeams.find((t) => t.id === targetId);
+          if (matched) {
+            const teamInfo = {
+              id: matched.id,
+              name: matched.name,
+              captainName: matched.captainName,
+              city: matched.city,
+            };
+            if (targetSide === 'team2') {
+              setTeam2(teamInfo);
+              updateTeamSquadFromTeamItem(teamInfo, 'team2', formattedTeams);
+            } else {
+              setTeam1(teamInfo);
+              updateTeamSquadFromTeamItem(teamInfo, 'team1', formattedTeams);
+            }
+          }
+        }
       } else {
         setTeams([]);
       }
@@ -175,12 +203,18 @@ export default function CreateMatchScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchTeamsList();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchTeamsList(routeParams.createdTeamId, routeParams.targetTeam as 'team1' | 'team2');
+    }, [routeParams.createdTeamId, routeParams.targetTeam, routeParams.refresh])
+  );
 
   // Update real squad players when team1 or team2 is selected or changes
-  const updateTeamSquadFromTeamItem = (selectedTeam: { id?: string; name: string } | null, target: 'team1' | 'team2') => {
+  const updateTeamSquadFromTeamItem = (
+    selectedTeam: { id?: string; name: string } | null,
+    target: 'team1' | 'team2',
+    teamsList?: TeamItem[]
+  ) => {
     if (!selectedTeam) {
       if (target === 'team1') {
         setTeam1Players([]);
@@ -197,7 +231,8 @@ export default function CreateMatchScreen() {
     }
 
     // Find actual team object in loaded teams
-    const fullTeam = teams.find((t) => t.id === selectedTeam.id || t.name === selectedTeam.name);
+    const sourceTeams = teamsList || teams;
+    const fullTeam = sourceTeams.find((t) => t.id === selectedTeam.id || t.name === selectedTeam.name);
     const loadedPlayers: SquadPlayer[] = fullTeam?.players
       ? fullTeam.players.map((p) => ({
           id: String(p.id),
@@ -629,10 +664,15 @@ export default function CreateMatchScreen() {
                 </Text>
                 <TouchableOpacity
                   style={styles.emptyBtn}
-                  onPress={() => router.push('/(tabs)/teams')}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/(tabs)/teams',
+                      params: { source: 'start_match', targetTeam: 'team1' },
+                    })
+                  }
                 >
                   <Icon source="plus" size={18} color={COLORS.surfaceWhite} />
-                  <Text style={styles.emptyBtnText}>Go to Teams & Create Team</Text>
+                  <Text style={styles.emptyBtnText}>Create Team</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -1996,6 +2036,17 @@ export default function CreateMatchScreen() {
             }
           }}
           onClose={() => setTeamPickerMode(null)}
+          onCreateNewTeam={() => {
+            const currentMode = teamPickerMode;
+            setTeamPickerMode(null);
+            router.push({
+              pathname: '/(tabs)/teams',
+              params: {
+                source: 'start_match',
+                targetTeam: currentMode || (team1 ? 'team2' : 'team1'),
+              },
+            });
+          }}
         />
       ) : null}
 
