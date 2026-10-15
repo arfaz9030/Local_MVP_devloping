@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  Animated,
+  Dimensions,
   Modal,
   Platform,
   Pressable,
@@ -34,8 +36,63 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
   const router = useRouter();
   const { logout } = useAuth();
 
+  const drawerWidth = Math.min(320, Dimensions.get('window').width * 0.78);
+  const slideAnim = useRef(new Animated.Value(-drawerWidth)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [modalVisible, setModalVisible] = useState(visible);
+
+  useEffect(() => {
+    if (visible) {
+      setModalVisible(true);
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: -drawerWidth,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setModalVisible(false);
+      });
+    }
+  }, [visible, drawerWidth, slideAnim, fadeAnim]);
+
+  const handleClose = () => {
+    Animated.parallel([
+      Animated.timing(slideAnim, {
+        toValue: -drawerWidth,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onClose();
+    });
+  };
+
   const handleNavigate = (route: string) => {
-    onClose();
+    handleClose();
     if (route === '/(tabs)' || route === '/(tabs)/teams' || route === '/(tabs)/academy') {
       router.replace(route as any);
     } else {
@@ -44,28 +101,26 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
   };
 
   const handleLogout = async () => {
-    onClose();
+    handleClose();
     await logout();
   };
 
   return (
     <Modal
-      visible={visible}
+      visible={modalVisible}
       transparent
-      animationType="fade"
-      onRequestClose={onClose}
+      animationType="none"
+      onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
-        {/* Backdrop press to close */}
-        <Pressable style={styles.backdrop} onPress={onClose} />
-
-        {/* Drawer Slide-in Container */}
-        <View
+        {/* Drawer Slide-in Container (Positioned on the Left) */}
+        <Animated.View
           style={[
             styles.drawerContent,
             {
               paddingTop: topInset + 16,
               paddingBottom: Math.max(bottomInset, 16),
+              transform: [{ translateX: slideAnim }],
             },
           ]}
         >
@@ -190,7 +245,12 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
 
             <Text style={styles.versionText}>CrickHero MVP v1.0 • Demo Build</Text>
           </View>
-        </View>
+        </Animated.View>
+
+        {/* Backdrop press to close (Right Side) */}
+        <Animated.View style={[styles.backdropContainer, { opacity: fadeAnim }]}>
+          <Pressable style={styles.backdrop} onPress={handleClose} />
+        </Animated.View>
       </View>
     </Modal>
   );
@@ -199,8 +259,11 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
     flexDirection: 'row',
+  },
+  backdropContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
   },
   backdrop: {
     flex: 1,

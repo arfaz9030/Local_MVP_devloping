@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   FlatList,
   Modal,
   Platform,
@@ -324,11 +325,12 @@ export default function CreateMatchScreen() {
   }, [currentStage, battingPlayers, bowlingPlayers, strikerId, nonStrikerId, openingBowlerId]);
 
   // Navigation between stages
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setErrorMsg('');
     switch (currentStage) {
       case 'TEAM_SELECT':
-        router.back();
+        // Ensure returning to the intended Matches screen
+        router.replace('/(tabs)');
         break;
       case 'SETTINGS':
         setCurrentStage('TEAM_SELECT');
@@ -349,7 +351,51 @@ export default function CreateMatchScreen() {
         setCurrentStage('TOSS');
         break;
     }
-  };
+  }, [currentStage, router]);
+
+  // Android hardware Back handler: respects open modals, wizard stages, and clean exit to Matches
+  useFocusEffect(
+    useCallback(() => {
+      const onHardwareBack = () => {
+        // 1. Dismiss active pickers/modals first
+        if (teamPickerMode) {
+          setTeamPickerMode(null);
+          return true;
+        }
+        if (groundPickerVisible) {
+          setGroundPickerVisible(false);
+          return true;
+        }
+        if (activeOfficialModalRole) {
+          setActiveOfficialModalRole(null);
+          return true;
+        }
+        if (addSquadPlayerTeam) {
+          setAddSquadPlayerTeam(null);
+          return true;
+        }
+
+        // 2. Step back through wizard stages, or exit to Matches at TEAM_SELECT
+        handleBack();
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onHardwareBack
+      );
+
+      return () => {
+        subscription.remove();
+      };
+    }, [
+      teamPickerMode,
+      groundPickerVisible,
+      activeOfficialModalRole,
+      addSquadPlayerTeam,
+      handleBack,
+    ])
+  );
 
   // Step 1: Team Selection validation -> Step 2: Settings
   const handleProceedFromTeamSelect = () => {
@@ -650,7 +696,7 @@ export default function CreateMatchScreen() {
                 <Icon source="alert-circle-outline" size={48} color="#F87171" />
                 <Text style={styles.emptyTitle}>Could not load teams</Text>
                 <Text style={styles.emptySubtitle}>{teamsError}</Text>
-                <TouchableOpacity style={styles.emptyBtn} onPress={fetchTeamsList}>
+                <TouchableOpacity style={styles.emptyBtn} onPress={() => fetchTeamsList()}>
                   <Text style={styles.emptyBtnText}>Retry Loading Teams</Text>
                 </TouchableOpacity>
               </View>

@@ -13,7 +13,7 @@ export type Match = {
     status: string;
 };
 
-export const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+export const BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
 async function parseJsonResponse<T>(response: Response): Promise<T> {
     if (response.status === 401) {
         await handleUnauthorized();

@@ -15,6 +15,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [step, setStep] = useState<OnboardingStep>('PROMO');
   const [phoneNumber, setPhoneNumber] = useState('7680922101');
   const [otpCode, setOtpCode] = useState(['', '', '', '', '']);
+  const [phoneError, setPhoneError] = useState('');
   const [otpError, setOtpError] = useState('');
   const [selectedRole, setSelectedRole] = useState('All-Rounder');
   const [experienceLevel, setExperienceLevel] = useState('Intermediate');
@@ -30,8 +31,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
   const handlePhoneSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!phoneNumber || phoneNumber.length < 10) {
-      alert('Please enter a valid 10-digit mobile number');
+    setPhoneError('');
+    if (!phoneNumber || phoneNumber.replace(/\D/g, '').length < 10) {
+      setPhoneError('Please enter a valid 10-digit mobile number');
       return;
     }
     setStep('WAITING');
@@ -243,6 +245,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     maxLength={10}
                   />
                 </div>
+                {phoneError && (
+                  <p className="text-xs text-red-400 mt-1.5 font-medium">{phoneError}</p>
+                )}
               </div>
 
               <div className="relative flex py-2 items-center">
