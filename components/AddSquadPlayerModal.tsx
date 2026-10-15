@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: COLORS.brandRed,
+    backgroundColor: COLORS.brandTeal,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -298,8 +298,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   chipActive: {
-    backgroundColor: '#0F766E',
-    borderColor: COLORS.brandTeal,
+    backgroundColor: '#007F78',
+    borderColor: '#5EEAD4',
   },
   chipText: {
     color: COLORS.textMuted,

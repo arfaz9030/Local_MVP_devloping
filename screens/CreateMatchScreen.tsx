@@ -681,14 +681,14 @@ export default function CreateMatchScreen() {
                 <View style={styles.formCard}>
                   <View style={styles.sectionHeaderBetween}>
                     <Text style={styles.cardHeaderTitle}>TEAM 1 (MY TEAM / HOST)</Text>
-                    <View style={[styles.teamBadgePill, { backgroundColor: '#16A34A' }]}>
+                    <View style={[styles.teamBadgePill, { backgroundColor: COLORS.brandTeal }]}>
                       <Text style={styles.teamBadgePillText}>TEAM A</Text>
                     </View>
                   </View>
 
                   {team1 ? (
                     <View style={styles.selectedTeamBox}>
-                      <View style={[styles.matchupAvatar, { backgroundColor: '#16A34A' }]}>
+                      <View style={[styles.matchupAvatar, { backgroundColor: COLORS.brandTeal }]}>
                         <Text style={styles.matchupAvatarText}>
                           {team1.name.substring(0, 2).toUpperCase()}
                         </Text>
@@ -728,14 +728,14 @@ export default function CreateMatchScreen() {
                 <View style={styles.formCard}>
                   <View style={styles.sectionHeaderBetween}>
                     <Text style={styles.cardHeaderTitle}>TEAM 2 (OPPONENT)</Text>
-                    <View style={[styles.teamBadgePill, { backgroundColor: '#DC2626' }]}>
+                    <View style={[styles.teamBadgePill, { backgroundColor: '#0284C7' }]}>
                       <Text style={styles.teamBadgePillText}>TEAM B</Text>
                     </View>
                   </View>
 
                   {team2 ? (
                     <View style={styles.selectedTeamBox}>
-                      <View style={[styles.matchupAvatar, { backgroundColor: '#DC2626' }]}>
+                      <View style={[styles.matchupAvatar, { backgroundColor: '#0284C7' }]}>
                         <Text style={styles.matchupAvatarText}>
                           {team2.name.substring(0, 2).toUpperCase()}
                         </Text>
@@ -776,7 +776,7 @@ export default function CreateMatchScreen() {
                   <View style={styles.matchupBox}>
                     <View style={styles.matchupRow}>
                       <View style={styles.matchupTeam}>
-                        <View style={[styles.matchupAvatar, { backgroundColor: '#16A34A' }]}>
+                        <View style={[styles.matchupAvatar, { backgroundColor: COLORS.brandTeal }]}>
                           <Text style={styles.matchupAvatarText}>
                             {team1.name.substring(0, 2).toUpperCase()}
                           </Text>
@@ -792,7 +792,7 @@ export default function CreateMatchScreen() {
                       </View>
 
                       <View style={styles.matchupTeam}>
-                        <View style={[styles.matchupAvatar, { backgroundColor: '#DC2626' }]}>
+                        <View style={[styles.matchupAvatar, { backgroundColor: '#0284C7' }]}>
                           <Text style={styles.matchupAvatarText}>
                             {team2.name.substring(0, 2).toUpperCase()}
                           </Text>
@@ -843,7 +843,7 @@ export default function CreateMatchScreen() {
                   style={styles.matchupTeam}
                   onPress={() => setTeamPickerMode('team1')}
                 >
-                  <View style={[styles.matchupAvatar, { backgroundColor: '#16A34A' }]}>
+                  <View style={[styles.matchupAvatar, { backgroundColor: COLORS.brandTeal }]}>
                     <Text style={styles.matchupAvatarText}>
                       {team1?.name.substring(0, 2).toUpperCase() || 'T1'}
                     </Text>
@@ -865,7 +865,7 @@ export default function CreateMatchScreen() {
                   style={styles.matchupTeam}
                   onPress={() => setTeamPickerMode('team2')}
                 >
-                  <View style={[styles.matchupAvatar, { backgroundColor: '#DC2626' }]}>
+                  <View style={[styles.matchupAvatar, { backgroundColor: '#0284C7' }]}>
                     <Text style={styles.matchupAvatarText}>
                       {team2?.name.substring(0, 2).toUpperCase() || 'T2'}
                     </Text>
@@ -1695,7 +1695,7 @@ export default function CreateMatchScreen() {
                 onPress={() => setTossWinnerTeam('team1')}
                 activeOpacity={0.7}
               >
-                <View style={[styles.tossAvatar, { backgroundColor: '#16A34A' }]}>
+                <View style={[styles.tossAvatar, { backgroundColor: COLORS.brandTeal }]}>
                   <Text style={styles.tossAvatarText}>
                     {team1?.name.substring(0, 2).toUpperCase() || 'T1'}
                   </Text>
@@ -1728,7 +1728,7 @@ export default function CreateMatchScreen() {
                 onPress={() => setTossWinnerTeam('team2')}
                 activeOpacity={0.7}
               >
-                <View style={[styles.tossAvatar, { backgroundColor: '#DC2626' }]}>
+                <View style={[styles.tossAvatar, { backgroundColor: '#0284C7' }]}>
                   <Text style={styles.tossAvatarText}>
                     {team2?.name.substring(0, 2).toUpperCase() || 'T2'}
                   </Text>
@@ -1902,7 +1902,7 @@ export default function CreateMatchScreen() {
                 style={styles.openerSelectBox}
                 onPress={() => setOpenerPickerModal('striker')}
               >
-                <View style={[styles.playerAvatarBox, { backgroundColor: '#16A34A' }]}>
+                <View style={[styles.playerAvatarBox, { backgroundColor: COLORS.brandTeal }]}>
                   <Text style={styles.playerAvatarText}>
                     {battingPlayers
                       .find((p) => p.id === strikerId)
@@ -1929,7 +1929,7 @@ export default function CreateMatchScreen() {
                 style={styles.openerSelectBox}
                 onPress={() => setOpenerPickerModal('nonStriker')}
               >
-                <View style={[styles.playerAvatarBox, { backgroundColor: '#2563EB' }]}>
+                <View style={[styles.playerAvatarBox, { backgroundColor: '#0284C7' }]}>
                   <Text style={styles.playerAvatarText}>
                     {battingPlayers
                       .find((p) => p.id === nonStrikerId)
@@ -1970,7 +1970,7 @@ export default function CreateMatchScreen() {
                 style={styles.openerSelectBox}
                 onPress={() => setOpenerPickerModal('bowler')}
               >
-                <View style={[styles.playerAvatarBox, { backgroundColor: '#DC2626' }]}>
+                <View style={[styles.playerAvatarBox, { backgroundColor: '#334155' }]}>
                   <Text style={styles.playerAvatarText}>
                     {bowlingPlayers
                       .find((p) => p.id === openingBowlerId)
@@ -2244,7 +2244,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   topHeader: {
-    backgroundColor: COLORS.brandRed,
+    backgroundColor: COLORS.brandTeal,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -2263,7 +2263,7 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHT.bold,
   },
   headerStepText: {
-    color: '#FECACA',
+    color: '#CCFBF1',
     fontSize: FONT_SIZE.xs,
     marginTop: 2,
     fontWeight: '600',
@@ -2282,7 +2282,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 1,
   },
   stepperSegmentActive: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#5EEAD4',
   },
   stepperSegmentDone: {
     backgroundColor: COLORS.brandTeal,
@@ -2509,7 +2509,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   vsText: {
-    color: '#F59E0B',
+    color: '#5EEAD4',
     fontSize: FONT_SIZE.xs,
     fontWeight: '800',
   },
@@ -2564,8 +2564,8 @@ const styles = StyleSheet.create({
     borderColor: '#334155',
   },
   pillActive: {
-    backgroundColor: '#0F766E',
-    borderColor: COLORS.brandTeal,
+    backgroundColor: '#007F78',
+    borderColor: '#5EEAD4',
   },
   pillText: {
     color: COLORS.textMuted,
@@ -2683,7 +2683,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   nextCtaBtn: {
-    backgroundColor: COLORS.brandRed,
+    backgroundColor: COLORS.brandTeal,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -2788,7 +2788,7 @@ const styles = StyleSheet.create({
   },
   teamTabBtnActive: {
     borderBottomColor: COLORS.brandTeal,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111C34',
   },
   teamTabBtnText: {
     color: COLORS.textMuted,
@@ -2806,7 +2806,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   countBadgeText: {
-    color: COLORS.brandTeal,
+    color: '#5EEAD4',
     fontSize: 11,
     fontWeight: '700',
   },
@@ -2932,8 +2932,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   playerSelectCardActive: {
-    borderColor: COLORS.brandTeal,
-    backgroundColor: '#13283E',
+    borderColor: '#5EEAD4',
+    backgroundColor: '#111C34',
   },
   checkbox: {
     width: 22,
@@ -3109,8 +3109,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tossTeamCardSelected: {
-    borderColor: COLORS.brandTeal,
-    backgroundColor: '#13283E',
+    borderColor: '#5EEAD4',
+    backgroundColor: '#111C34',
   },
   tossAvatar: {
     width: 56,
@@ -3211,8 +3211,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   decisionBtnActive: {
-    borderColor: COLORS.brandTeal,
-    backgroundColor: '#13283E',
+    borderColor: '#5EEAD4',
+    backgroundColor: '#111C34',
   },
   decisionBtnTitle: {
     color: COLORS.textMuted,
@@ -3244,12 +3244,12 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   matchupSummaryCard: {
-    backgroundColor: '#162344',
+    backgroundColor: '#111C34',
     borderRadius: 14,
     padding: 14,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: '#1E3A8A',
+    borderColor: '#1E293B',
   },
   summaryTitle: {
     color: COLORS.surfaceWhite,
@@ -3306,7 +3306,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   startScoringBtn: {
-    backgroundColor: '#16A34A',
+    backgroundColor: COLORS.brandTeal,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

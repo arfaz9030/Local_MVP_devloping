@@ -98,7 +98,7 @@ export default function MatchDetailScreen() {
   if (loading) {
     return (
       <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#2563EB" />
+        <ActivityIndicator size="large" color="#007F78" />
         <Text style={styles.loadingText}>Loading match...</Text>
       </View>
     );
@@ -231,11 +231,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   infoCard: {
-    backgroundColor: '#111827',
+    backgroundColor: '#111C34',
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#1E293B',
     marginBottom: 20,
   },
   infoTitle: {
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   primaryButton: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#007F78',
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   tertiaryButton: {
-    backgroundColor: '#020617',
+    backgroundColor: '#111C34',
     borderRadius: 16,
     paddingVertical: 14,
     alignItems: 'center',

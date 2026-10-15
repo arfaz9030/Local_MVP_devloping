@@ -16,7 +16,7 @@ export default function ProfileScreen() {
         <View style={styles.avatarContainer}>
           <Avatar.Text size={80} label="AM" style={styles.avatar} labelStyle={styles.avatarLabel} />
           <View style={styles.verifiedBadge}>
-            <List.Icon icon="check-decagram" color="#009688" style={styles.badgeIcon} />
+            <List.Icon icon="check-decagram" color="#007F78" style={styles.badgeIcon} />
           </View>
         </View>
         <Text style={styles.userName}>Arfaz Mohammad</Text>
@@ -29,25 +29,25 @@ export default function ProfileScreen() {
         <List.Item
           title="Mobile Number"
           description="+91 7680922101"
-          left={(props) => <List.Icon {...props} icon="phone" color="#1d978e" />}
+          left={(props) => <List.Icon {...props} icon="phone" color="#007F78" />}
         />
         <Divider style={styles.divider} />
         <List.Item
           title="Email Address"
           description="arfaz3838@gmail.com"
-          left={(props) => <List.Icon {...props} icon="email" color="#1d978e" />}
+          left={(props) => <List.Icon {...props} icon="email" color="#007F78" />}
         />
         <Divider style={styles.divider} />
         <List.Item
           title="Primary Location"
           description="Hyderabad, India"
-          left={(props) => <List.Icon {...props} icon="map-marker" color="#1d978e" />}
+          left={(props) => <List.Icon {...props} icon="map-marker" color="#007F78" />}
         />
         <Divider style={styles.divider} />
         <List.Item
           title="Member Since"
           description="July 2026"
-          left={(props) => <List.Icon {...props} icon="calendar-check" color="#1d978e" />}
+          left={(props) => <List.Icon {...props} icon="calendar-check" color="#007F78" />}
         />
       </List.Section>
 
@@ -57,7 +57,7 @@ export default function ProfileScreen() {
         <List.Item
           title="Willow Bat Customizer"
           description="Premium English Willow Grade-1 Active"
-          left={(props) => <List.Icon {...props} icon="cricket" color="#d32f2f" />}
+          left={(props) => <List.Icon {...props} icon="cricket" color="#007F78" />}
           right={(props) => <List.Icon {...props} icon="chevron-right" />}
         />
         <Divider style={styles.divider} />
@@ -96,7 +96,7 @@ export default function ProfileScreen() {
         }
         }
         style={styles.logoutBtn}
-        textColor="#d32f2f"
+        textColor="#DC2626"
         labelStyle={styles.logoutBtnLabel}
         icon="logout"
       >
@@ -109,7 +109,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8FAFC',
   },
   scrollContent: {
     padding: 16,
@@ -122,6 +122,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 16,
     backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     marginBottom: 20,
   },
   avatarContainer: {
@@ -129,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   avatar: {
-    backgroundColor: '#1d978e',
+    backgroundColor: '#007F78',
   },
   avatarLabel: {
     fontSize: 28,
@@ -155,12 +157,12 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#212121',
+    color: '#1E293B',
     textAlign: 'center',
   },
   userRole: {
     fontSize: 13,
-    color: '#757575',
+    color: '#64748B',
     marginTop: 4,
     textAlign: 'center',
   },
@@ -170,23 +172,25 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 16,
     paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   subheader: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#757575',
+    color: '#64748B',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   divider: {
-    backgroundColor: '#f1f1f1',
+    backgroundColor: '#E2E8F0',
     height: 1,
   },
   logoutBtn: {
     borderRadius: 8,
     marginTop: 12,
     borderWidth: 1.5,
-    borderColor: '#d32f2f',
+    borderColor: '#DC2626',
   },
   logoutBtnLabel: {
     fontSize: 14,

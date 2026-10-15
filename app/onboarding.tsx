@@ -132,7 +132,7 @@ export default function OnboardingScreen() {
               mode="contained"
               onPress={() => setStep('TRUECALLER')}
               style={styles.startBtn}
-              buttonColor="#d32f2f"
+              buttonColor="#007F78"
               textColor="#ffffff"
               id="promo-start-btn"
             >
@@ -161,7 +161,7 @@ export default function OnboardingScreen() {
                   mode="contained"
                   onPress={handleTruecallerVerify}
                   style={styles.tcActionBtn}
-                  buttonColor="#1d978e"
+                  buttonColor="#007F78"
                   id="tc-use-number-btn"
                 >
                   USE 7680922101
@@ -239,7 +239,7 @@ export default function OnboardingScreen() {
             <Button
               mode="text"
               onPress={handleSkipOrComplete}
-              textColor="#1d978e"
+              textColor="#007F78"
               style={styles.guestLinkBtn}
               id="explore-guest-btn"
             >
@@ -261,7 +261,7 @@ export default function OnboardingScreen() {
             mode="contained"
             onPress={handleOtpVerify}
             style={styles.otpSubmitBtn}
-            buttonColor="#1d978e"
+            buttonColor="#007F78"
             disabled={otpCode.length < 5}
             id="otp-verify-btn"
           >
@@ -280,8 +280,8 @@ export default function OnboardingScreen() {
           <Dialog visible={true} dismissable={false} style={styles.waitDialog}>
             <Dialog.Content style={styles.waitDialogContent}>
               <Text style={styles.waitHeader}>Hi, Arfaz Mohammad</Text>
-              <ActivityIndicator animating={true} color="#1d978e" size="large" style={styles.waitSpinner} />
-              <Button mode="contained" buttonColor="#1d978e" style={styles.waitDisabledBtn} disabled>
+              <ActivityIndicator animating={true} color="#007F78" size="large" style={styles.waitSpinner} />
+              <Button mode="contained" buttonColor="#007F78" style={styles.waitDisabledBtn} disabled>
                 PLEASE WAIT...
               </Button>
             </Dialog.Content>
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: '#d32f2f',
+    backgroundColor: '#007F78',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   willowHeading: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#d32f2f',
+    color: '#007F78',
     textAlign: 'center',
     marginTop: 6,
   },
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#d32f2f',
+    backgroundColor: '#007F78',
   },
   brandTitleText: {
     fontSize: 22,

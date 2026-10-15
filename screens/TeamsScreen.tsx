@@ -237,8 +237,8 @@ export const TeamsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.brandRed} translucent />
-      {/* Red Top Header */}
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.brandTeal} translucent />
+      {/* Brand Top Header */}
       <View style={[styles.topHeader, { paddingTop: topInset + 10 }]}>
         <View style={styles.headerLeft}>
           {activeTab === 'add' || isFromStartMatch ? (
@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   topHeader: {
-    backgroundColor: COLORS.brandRed,
+    backgroundColor: COLORS.brandTeal,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -663,7 +663,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   tabTextActive: {
-    color: '#0F172A',
+    color: COLORS.brandTeal,
     fontWeight: '800',
   },
   activeIndicator: {
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     height: 3,
-    backgroundColor: COLORS.brandRed,
+    backgroundColor: COLORS.brandTeal,
     borderRadius: 2,
   },
   contentArea: {

@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: COLORS.brandRed,
+    backgroundColor: COLORS.brandTeal,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -224,20 +224,20 @@ const styles = StyleSheet.create({
   locationBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#162344',
+    backgroundColor: '#111C34',
     marginHorizontal: 16,
     marginTop: 12,
     padding: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#1E3A8A',
+    borderColor: '#1E293B',
     gap: 12,
   },
   locationIconBox: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#0F2F38',
+    backgroundColor: '#1E293B',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -299,8 +299,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   groundCardSelected: {
-    borderColor: COLORS.brandTeal,
-    backgroundColor: '#13283E',
+    borderColor: '#5EEAD4',
+    backgroundColor: '#111C34',
   },
   groundIconBox: {
     width: 42,

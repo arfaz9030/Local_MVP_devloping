@@ -41,7 +41,7 @@ export default function SurveyDialog({ visible, onDismiss, onStartSurvey }: Surv
             mode="contained"
             onPress={onStartSurvey}
             style={styles.surveyBtn}
-            buttonColor="#009688"
+            buttonColor="#007F78"
             textColor="#ffffff"
           >
             Start survey
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     height: 180,
-    backgroundColor: '#e53935',
+    backgroundColor: '#007F78',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   },
   logoOverlay: {
     alignItems: 'center',
-    backgroundColor: 'rgba(211, 47, 47, 0.85)',
+    backgroundColor: 'rgba(0, 127, 120, 0.85)',
     padding: 16,
     borderRadius: 12,
   },
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#c62828',
+    color: '#007F78',
     marginBottom: 8,
     textAlign: 'center',
   },

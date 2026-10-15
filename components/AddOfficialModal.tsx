@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: COLORS.brandRed,
+    backgroundColor: COLORS.brandTeal,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

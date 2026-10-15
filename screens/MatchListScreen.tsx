@@ -287,7 +287,7 @@ export default function MatchListScreen() {
   if (loading) {
     return (
       <View style={[styles.container, styles.centerContent, { paddingTop: insets.top }]}>
-        <ActivityIndicator size="large" color="#2563EB" />
+        <ActivityIndicator size="large" color="#007F78" />
         <Text style={styles.loadingText}>Loading matches...</Text>
       </View>
     );
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   menuButton: {
     padding: 6,
     borderRadius: 10,
-    backgroundColor: '#162344',
+    backgroundColor: '#111C34',
   },
   headerTextGroup: {
     flex: 1,
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   createButton: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#007F78',
     borderRadius: 16,
     paddingVertical: 14,
     alignItems: 'center',
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#007F78',
     borderRadius: 12,
     paddingHorizontal: 18,
     paddingVertical: 10,

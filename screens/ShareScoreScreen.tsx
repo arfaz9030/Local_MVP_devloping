@@ -64,21 +64,21 @@ export default function ShareScoreScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617',
+    backgroundColor: '#0B1220',
     padding: 20,
     alignItems: 'center',
   },
   poster: {
     width: '100%',
-    backgroundColor: '#0F172A',
+    backgroundColor: '#111C34',
     borderRadius: 24,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#1E293B',
     alignItems: 'center',
   },
   academyName: {
-    color: '#FACC15',
+    color: '#5EEAD4',
     fontSize: 16,
     fontWeight: '800',
     letterSpacing: 1,
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   footerLine: {
-    color: '#BFDBFE',
+    color: '#5EEAD4',
     fontSize: 14,
     textAlign: 'center',
     marginTop: 6,
@@ -137,13 +137,13 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     marginTop: 18,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#007F78',
     borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 24,
   },
   primaryButtonText: {
-    color: '#E5E7EB',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },

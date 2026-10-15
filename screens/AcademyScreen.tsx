@@ -210,6 +210,8 @@ export default function AcademyScreen() {
 
       <Button
         mode="contained"
+        buttonColor="#007F78"
+        textColor="#FFFFFF"
         style={styles.callButton}
         onPress={handleCall}>
         Call Academy
@@ -217,6 +219,8 @@ export default function AcademyScreen() {
 
       <Button
         mode="outlined"
+        textColor="#007F78"
+        theme={{ colors: { outline: '#007F78' } }}
         style={styles.whatsappButton}
         onPress={handleWhatsApp}>
         WhatsApp Enquiry
@@ -230,24 +234,24 @@ export default function AcademyScreen() {
 }
 
 const styles = StyleSheet.create({
-  container:{flex:1,backgroundColor:'#F5F5F5'},
-  content:{padding:16,paddingBottom:40},
-  header:{marginBottom:16},
-  title:{fontSize:26,fontWeight:'700',color:'#212121'},
-  subtitle:{fontSize:14,color:'#666'},
-  heroCard:{borderRadius:14,overflow:'hidden',marginBottom:18},
-  image:{height:180,width:'100%'},
-  badge:{position:'absolute',top:12,left:12,backgroundColor:'#D32F2F'},
-  courseTitle:{fontSize:20,fontWeight:'700',marginVertical:10},
-  coachCard:{backgroundColor:'#F2F2F2',padding:12,borderRadius:10,marginTop:12},
-  coachTitle:{fontWeight:'700'},
-  sectionCard:{borderRadius:14,marginBottom:18},
-  sectionTitle:{fontSize:17,fontWeight:'700',marginTop:12},
-  body:{fontSize:14,lineHeight:22,color:'#555',marginTop:6},
-  sectionHeading:{fontSize:20,fontWeight:'700',marginBottom:10},
-  centerCard:{borderRadius:12,marginBottom:20},
-  centerName:{fontWeight:'700',fontSize:16},
-  callButton:{marginBottom:12},
-  whatsappButton:{marginBottom:16},
-  footer:{textAlign:'center',color:'#777',fontSize:12}
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  content: { padding: 16, paddingBottom: 40 },
+  header: { marginBottom: 16 },
+  title: { fontSize: 26, fontWeight: '700', color: '#1E293B' },
+  subtitle: { fontSize: 14, color: '#64748B', marginTop: 2 },
+  heroCard: { borderRadius: 14, overflow: 'hidden', marginBottom: 18, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E2E8F0' },
+  image: { height: 180, width: '100%' },
+  badge: { position: 'absolute', top: 12, left: 12, backgroundColor: '#007F78' },
+  courseTitle: { fontSize: 20, fontWeight: '700', marginVertical: 10, color: '#1E293B' },
+  coachCard: { backgroundColor: '#F1F5F9', padding: 12, borderRadius: 10, marginTop: 12 },
+  coachTitle: { fontWeight: '700', color: '#1E293B' },
+  sectionCard: { borderRadius: 14, marginBottom: 18, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E2E8F0' },
+  sectionTitle: { fontSize: 17, fontWeight: '700', marginTop: 12, color: '#1E293B' },
+  body: { fontSize: 14, lineHeight: 22, color: '#64748B', marginTop: 6 },
+  sectionHeading: { fontSize: 20, fontWeight: '700', marginBottom: 10, color: '#1E293B' },
+  centerCard: { borderRadius: 12, marginBottom: 20, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E2E8F0' },
+  centerName: { fontWeight: '700', fontSize: 16, color: '#1E293B' },
+  callButton: { marginBottom: 12, borderRadius: 10 },
+  whatsappButton: { marginBottom: 16, borderRadius: 10 },
+  footer: { textAlign: 'center', color: '#94A3B8', fontSize: 12 }
 });

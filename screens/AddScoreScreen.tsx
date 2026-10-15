@@ -156,7 +156,7 @@ export default function AddScoreScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617',
+    backgroundColor: '#0B1220',
     padding: 20,
   },
   headerBlock: {
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   subtitle: {
-    color: '#38BDF8',
+    color: '#5EEAD4',
     fontSize: 14,
     marginTop: 4,
   },
@@ -178,11 +178,11 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   formCard: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#111C34',
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#1E293B',
     marginBottom: 20,
   },
   label: {
@@ -193,10 +193,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   input: {
-    backgroundColor: '#020617',
+    backgroundColor: '#0B1220',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#1E293B',
     paddingHorizontal: 12,
     paddingVertical: 10,
     color: '#FFFFFF',
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   primaryButton: {
-    backgroundColor: '#16A34A',
+    backgroundColor: '#007F78',
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: '#E5E7EB',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
   },
