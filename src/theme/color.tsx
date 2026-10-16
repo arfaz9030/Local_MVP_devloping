@@ -1,7 +1,6 @@
 export const COLORS = {
   // Dark match background
   background: '#0B1220', // Midnight Navy
-  gitk
 
   // Dark card background & borders
   card: '#111C34', // Deep Navy Card
