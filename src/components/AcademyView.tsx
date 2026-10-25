@@ -6,15 +6,6 @@ export const AcademyView: React.FC = () => {
   const [inquirySent, setInquirySent] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState('Weekend Morning (6:00 AM - 9:00 AM)');
 
-  const handleCall = () => {
-    window.open(`tel:${ACADEMY_INFO.contact.phone}`, '_self');
-  };
-
-  const handleWhatsApp = () => {
-    const msg = encodeURIComponent('Hi, I am interested in joining CrickHero Elite Academy training batches.');
-    window.open(`https://wa.me/917680922101?text=${msg}`, '_blank');
-  };
-
   const handleBookTrial = (e: React.FormEvent) => {
     e.preventDefault();
     setInquirySent(true);
@@ -159,19 +150,21 @@ export const AcademyView: React.FC = () => {
 
       {/* Action Buttons matching original screen */}
       <div className="space-y-2.5 pt-2">
-        <button
-          onClick={handleCall}
-          className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition cursor-pointer"
+        <a
+          href={`tel:${ACADEMY_INFO.contact.phone.replace(/\s+/g, '')}`}
+          className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition cursor-pointer text-center no-underline"
         >
           <Phone size={16} /> Call Academy Hotline (+91 76809 22101)
-        </button>
+        </a>
 
-        <button
-          onClick={handleWhatsApp}
-          className="w-full py-3 bg-[#128C7E] hover:bg-[#0f7a6e] text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer"
+        <a
+          href="https://wa.me/917680922101?text=Hi%2C%20I%20am%20interested%20in%20joining%20CrickHero%20Elite%20Academy%20training%20batches."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full py-3 bg-[#128C7E] hover:bg-[#0f7a6e] text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer text-center no-underline"
         >
           <MessageSquare size={16} /> WhatsApp Enquiry
-        </button>
+        </a>
 
         <p className="text-[11px] text-center text-slate-500 pt-1">
           MVP Version — Academy training schedules & slots synced with Gachibowli turf.

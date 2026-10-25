@@ -93,6 +93,11 @@ Complete Teams + Players Module (frontend and backend integration).
   - Captain & Wicket Keeper selection screen with dual `[ C ]` and `[ WK ]` toggle controls
   - Interactive Toss screen with Team vs Team cards, interactive coin flip, and BAT/BOWL decision cards
   - Openers selection (Striker, Non-Striker, Opening Bowler) with batting/bowling style tags, match overview, and Start Scoring integration
+- [x] Phase 1 Navigation Fixes:
+  - Drawer direction corrected: AppDrawer now opens strictly from the left edge sliding towards the right (`translateX` from `-DRAWER_WIDTH` to `0`) with overlay backdrop positioned on the right.
+  - Start Match exit navigation: Exiting the match creation flow at `TEAM_SELECT` returns directly to the main Matches tab (`/(tabs)`) displaying the full matches list.
+  - Tab navigator initial route: Configured `initialRouteName="index"` in `app/(tabs)/_layout.tsx` ensuring `/(tabs)` reliably targets the Matches tab rather than defaulting to the first listed tab.
+  - Android hardware Back handling: Implemented scoped `BackHandler` listeners in `CreateMatchScreen` and `TeamsScreen` prioritizing active modal dismissal, wizard stage regression, and clean exit without double-navigation or unintended route pops.
 
 ### In Progress
 

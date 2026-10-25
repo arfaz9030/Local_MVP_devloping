@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   FlatList,
   Platform,
   Pressable,
@@ -105,6 +106,40 @@ export const TeamsScreen: React.FC = () => {
     }
   }, [isFromStartMatch]);
 
+  // Hardware Back button handling on Android
+  useEffect(() => {
+    const onBackPress = () => {
+      if (drawerVisible) {
+        setDrawerVisible(false);
+        return true;
+      }
+      if (inviteModalVisible) {
+        setInviteModalVisible(false);
+        return true;
+      }
+      if (qrModalVisible) {
+        setQrModalVisible(false);
+        return true;
+      }
+      if (isFromStartMatch) {
+        router.back();
+        return true;
+      }
+      if (activeTab === 'add') {
+        setActiveTab('your_teams');
+        return true;
+      }
+      return false;
+    };
+
+    const backSubscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress
+    );
+
+    return () => backSubscription.remove();
+  }, [drawerVisible, inviteModalVisible, qrModalVisible, isFromStartMatch, activeTab, router]);
+
   // Handle Team Creation
   const handleAddTeam = async () => {
     const trimmedTeamName = teamName.trim();
@@ -160,26 +195,10 @@ export const TeamsScreen: React.FC = () => {
       setAddSelf(false);
 
       if (isFromStartMatch) {
-        Alert.alert(
-          'Team Created',
-          `${trimmedTeamName} has been created successfully! Returning to match setup...`,
-          [
-            {
-              text: 'Continue',
-              onPress: () => {
-                router.replace({
-                  pathname: '/create-match',
-                  params: {
-                    createdTeamId: String(response.id),
-                    targetTeam: targetTeam,
-                    refresh: Date.now().toString(),
-                  },
-                });
-              },
-            },
-          ]
-        );
-        setTimeout(() => {
+        let navigated = false;
+        const navigateToMatch = () => {
+          if (navigated) return;
+          navigated = true;
           router.replace({
             pathname: '/create-match',
             params: {
@@ -188,7 +207,19 @@ export const TeamsScreen: React.FC = () => {
               refresh: Date.now().toString(),
             },
           });
-        }, 500);
+        };
+
+        Alert.alert(
+          'Team Created',
+          `${trimmedTeamName} has been created successfully! Returning to match setup...`,
+          [
+            {
+              text: 'Continue',
+              onPress: navigateToMatch,
+            },
+          ]
+        );
+        setTimeout(navigateToMatch, 800);
       } else {
         // Switch to your teams tab for normal flow outside Start Match
         setActiveTab('your_teams');

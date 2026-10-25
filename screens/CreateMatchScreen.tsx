@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   FlatList,
   Modal,
   Platform,
@@ -328,7 +329,7 @@ export default function CreateMatchScreen() {
     setErrorMsg('');
     switch (currentStage) {
       case 'TEAM_SELECT':
-        router.back();
+        router.replace('/(tabs)');
         break;
       case 'SETTINGS':
         setCurrentStage('TEAM_SELECT');
@@ -350,6 +351,53 @@ export default function CreateMatchScreen() {
         break;
     }
   };
+
+  // Hardware Back button handling on Android
+  useEffect(() => {
+    const onBackPress = () => {
+      // 1. If any modal is active, dismiss it first
+      if (teamPickerMode) {
+        setTeamPickerMode(null);
+        return true;
+      }
+      if (groundPickerVisible) {
+        setGroundPickerVisible(false);
+        return true;
+      }
+      if (activeOfficialModalRole) {
+        setActiveOfficialModalRole(null);
+        return true;
+      }
+      if (addPlayerModalTeam) {
+        setAddPlayerModalTeam(null);
+        return true;
+      }
+
+      // 2. If inside wizard stages, step back through the wizard
+      if (currentStage !== 'TEAM_SELECT') {
+        handleBack();
+        return true;
+      }
+
+      // 3. At initial stage (TEAM_SELECT), exiting Start Match returns to the Matches tab
+      router.replace('/(tabs)');
+      return true;
+    };
+
+    const backSubscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress
+    );
+
+    return () => backSubscription.remove();
+  }, [
+    teamPickerMode,
+    groundPickerVisible,
+    activeOfficialModalRole,
+    addPlayerModalTeam,
+    currentStage,
+    router,
+  ]);
 
   // Step 1: Team Selection validation -> Step 2: Settings
   const handleProceedFromTeamSelect = () => {

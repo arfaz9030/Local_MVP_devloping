@@ -4,7 +4,7 @@
  */
 import { getToken, saveToken } from './tokenService';
 
-export const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
+export const BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
 // export interface ApiResponse<T = any> {
 //   success: boolean;
 //   message: string;

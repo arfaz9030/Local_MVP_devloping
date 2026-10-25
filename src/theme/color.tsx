@@ -2,6 +2,7 @@ export const COLORS = {
   // Dark match background
   background: '#0B1220', // Midnight Navy
 
+
   // Dark card background & borders
   card: '#111C34', // Deep Navy Card
   border: '#1E293B', // Dark Slate
