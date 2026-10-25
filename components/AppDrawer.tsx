@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Animated,
-  Dimensions,
+  Easing,
   Modal,
   Platform,
   Pressable,
@@ -17,6 +17,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../app/_layout';
 import { COLORS } from '../src/theme/color';
 import { FONT_SIZE, FONT_WEIGHT } from '../src/theme/typography';
+
+const DRAWER_WIDTH = 320;
 
 interface AppDrawerProps {
   visible: boolean;
@@ -36,18 +38,16 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
   const router = useRouter();
   const { logout } = useAuth();
 
-  const drawerWidth = Math.min(320, Dimensions.get('window').width * 0.78);
-  const slideAnim = useRef(new Animated.Value(-drawerWidth)).current;
+  const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const [modalVisible, setModalVisible] = useState(visible);
 
   useEffect(() => {
     if (visible) {
-      setModalVisible(true);
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
           duration: 250,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.timing(fadeAnim, {
@@ -57,28 +57,17 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
         }),
       ]).start();
     } else {
-      Animated.parallel([
-        Animated.timing(slideAnim, {
-          toValue: -drawerWidth,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setModalVisible(false);
-      });
+      slideAnim.setValue(-DRAWER_WIDTH);
+      fadeAnim.setValue(0);
     }
-  }, [visible, drawerWidth, slideAnim, fadeAnim]);
+  }, [visible, slideAnim, fadeAnim]);
 
-  const handleClose = () => {
+  const handleClose = (callback?: () => void) => {
     Animated.parallel([
       Animated.timing(slideAnim, {
-        toValue: -drawerWidth,
+        toValue: -DRAWER_WIDTH,
         duration: 200,
+        easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
@@ -88,32 +77,45 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
       }),
     ]).start(() => {
       onClose();
+      if (callback) callback();
     });
   };
 
   const handleNavigate = (route: string) => {
-    handleClose();
-    if (route === '/(tabs)' || route === '/(tabs)/teams' || route === '/(tabs)/academy') {
-      router.replace(route as any);
-    } else {
-      router.push(route as any);
-    }
+    handleClose(() => {
+      if (route === '/(tabs)' || route === '/(tabs)/teams' || route === '/(tabs)/academy') {
+        router.replace(route as any);
+      } else {
+        router.push(route as any);
+      }
+    });
   };
 
   const handleLogout = async () => {
-    handleClose();
-    await logout();
+    handleClose(async () => {
+      await logout();
+    });
   };
 
   return (
     <Modal
-      visible={modalVisible}
+      visible={visible}
       transparent
       animationType="none"
-      onRequestClose={handleClose}
+      onRequestClose={() => handleClose()}
     >
-      <View style={styles.overlay}>
-        {/* Drawer Slide-in Container (Positioned on the Left) */}
+      <Animated.View
+        style={[
+          styles.overlay,
+          {
+            backgroundColor: fadeAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.65)'],
+            }),
+          },
+        ]}
+      >
+        {/* Drawer Slide-in Container (Positioned on the LEFT first) */}
         <Animated.View
           style={[
             styles.drawerContent,
@@ -247,11 +249,9 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
           </View>
         </Animated.View>
 
-        {/* Backdrop press to close (Right Side) */}
-        <Animated.View style={[styles.backdropContainer, { opacity: fadeAnim }]}>
-          <Pressable style={styles.backdrop} onPress={handleClose} />
-        </Animated.View>
-      </View>
+        {/* Backdrop press to close (Takes remaining width on the RIGHT) */}
+        <Pressable style={styles.backdrop} onPress={() => handleClose()} />
+      </Animated.View>
     </Modal>
   );
 };
@@ -259,11 +259,8 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    flexDirection: 'row',
-  },
-  backdropContainer: {
-    flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    flexDirection: 'row',
   },
   backdrop: {
     flex: 1,

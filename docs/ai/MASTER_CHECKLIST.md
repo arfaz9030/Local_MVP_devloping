@@ -206,6 +206,10 @@ Status
 - [x] Captain & Wicket Keeper selection (dual `[ C ]` and `[ WK ]` toggle controls)
 - [x] Toss (Winner selection, interactive coin flip, elected to bat/bowl)
 - [x] Openers selection (Striker, Non-Striker, Opening Bowler)
+- [x] AppDrawer opening direction (slides from left to right with translateX translation and right-aligned backdrop)
+- [x] Start Match back navigation (exiting setup from TEAM_SELECT returns directly to main Matches tab /(tabs))
+- [x] Tab initial route configuration (initialRouteName="index" on Tabs ensures Matches tab is primary default)
+- [x] Android hardware Back handling (scoped BackHandler listeners for modal dismissal and step-by-step wizard reversal)
 - [ ] Match backend integration (persisted match data in database)
 
 Status

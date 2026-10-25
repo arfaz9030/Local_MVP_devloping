@@ -1,5 +1,5 @@
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -106,50 +106,39 @@ export const TeamsScreen: React.FC = () => {
     }
   }, [isFromStartMatch]);
 
-  // Android hardware Back handler
-  useFocusEffect(
-    useCallback(() => {
-      const onHardwareBack = () => {
-        if (drawerVisible) {
-          setDrawerVisible(false);
-          return true;
-        }
-        if (qrModalVisible) {
-          setQrModalVisible(false);
-          return true;
-        }
-        if (inviteModalVisible) {
-          setInviteModalVisible(false);
-          return true;
-        }
-        if (isFromStartMatch) {
-          router.back();
-          return true;
-        }
-        if (activeTab === 'add') {
-          setActiveTab('your_teams');
-          return true;
-        }
-        return false;
-      };
+  // Hardware Back button handling on Android
+  useEffect(() => {
+    const onBackPress = () => {
+      if (drawerVisible) {
+        setDrawerVisible(false);
+        return true;
+      }
+      if (inviteModalVisible) {
+        setInviteModalVisible(false);
+        return true;
+      }
+      if (qrModalVisible) {
+        setQrModalVisible(false);
+        return true;
+      }
+      if (isFromStartMatch) {
+        router.back();
+        return true;
+      }
+      if (activeTab === 'add') {
+        setActiveTab('your_teams');
+        return true;
+      }
+      return false;
+    };
 
-      const subscription = BackHandler.addEventListener(
-        'hardwareBackPress',
-        onHardwareBack
-      );
+    const backSubscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress
+    );
 
-      return () => {
-        subscription.remove();
-      };
-    }, [
-      drawerVisible,
-      qrModalVisible,
-      inviteModalVisible,
-      isFromStartMatch,
-      activeTab,
-      router,
-    ])
-  );
+    return () => backSubscription.remove();
+  }, [drawerVisible, inviteModalVisible, qrModalVisible, isFromStartMatch, activeTab, router]);
 
   // Handle Team Creation
   const handleAddTeam = async () => {
@@ -206,26 +195,31 @@ export const TeamsScreen: React.FC = () => {
       setAddSelf(false);
 
       if (isFromStartMatch) {
+        let navigated = false;
+        const navigateToMatch = () => {
+          if (navigated) return;
+          navigated = true;
+          router.replace({
+            pathname: '/create-match',
+            params: {
+              createdTeamId: String(response.id),
+              targetTeam: targetTeam,
+              refresh: Date.now().toString(),
+            },
+          });
+        };
+
         Alert.alert(
           'Team Created',
           `${trimmedTeamName} has been created successfully! Returning to match setup...`,
           [
             {
               text: 'Continue',
-              onPress: () => {
-                router.replace({
-                  pathname: '/create-match',
-                  params: {
-                    createdTeamId: String(response.id),
-                    targetTeam: targetTeam,
-                    refresh: Date.now().toString(),
-                  },
-                });
-              },
+              onPress: navigateToMatch,
             },
-          ],
-          { cancelable: false }
+          ]
         );
+        setTimeout(navigateToMatch, 800);
       } else {
         // Switch to your teams tab for normal flow outside Start Match
         setActiveTab('your_teams');
