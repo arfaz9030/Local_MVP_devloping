@@ -113,7 +113,7 @@ export const INITIAL_TEAMS: Team[] = [
 ];
 
 export const ACADEMY_INFO = {
-  name: 'CrickHero Elite Academy',
+  name: 'Match Day Elite Academy',
   tagline: 'Train like a pro. Play like a champion.',
   about: 'We focus on real match scenarios, fitness, and mental toughness to prepare young cricketers for league and tournament level with state-of-the-art turf pitches and high-speed bowling machines.',
   location: 'Hyderabad, Telangana (Near Gachibowli Stadium, Financial District)',

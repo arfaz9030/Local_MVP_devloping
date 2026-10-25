@@ -30,7 +30,7 @@ export const TeamQRModal: React.FC<TeamQRModalProps> = ({
     try {
       await Share.share({
         title: `Team QR Code: ${team.name}`,
-        message: `Join ${team.name} on CrickHero! Captain: ${team.captainName} (Demo QR Code Invitation)`,
+        message: `Join ${team.name} on Match Day! Captain: ${team.captainName} (Demo QR Code Invitation)`,
       });
     } catch (err) {
       console.error('Error sharing QR details:', err);
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill as any,
   },
   card: {
     width: '100%',

@@ -245,7 +245,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
               <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
 
-            <Text style={styles.versionText}>CrickHero MVP v1.0 • Demo Build</Text>
+            <Text style={styles.versionText}>Match Day MVP v1.0 • Demo Build</Text>
           </View>
         </Animated.View>
 

@@ -9,7 +9,7 @@ interface OTPInputProps {
 
 export default function OTPInput({ value, onChange }: OTPInputProps) {
   const [code, setCode] = useState(['', '', '', '', '']);
-  const inputs = useRef<Array<NativeTextInput | null>>([]);
+  const inputs = useRef<Array<any>>([]);
 
   const handleChange = (text: string, index: number) => {
     const newCode = [...code];

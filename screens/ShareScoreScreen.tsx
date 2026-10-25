@@ -30,7 +30,7 @@ export default function ShareScoreScreen({
   return (
     <View style={styles.container}>
       <View style={styles.poster}>
-        <Text style={styles.academyName}>CrickHero Elite Academy</Text>
+        <Text style={styles.academyName}>Match Day Elite Academy</Text>
         <Text style={styles.tagline}>Official Match Scorecard</Text>
 
         <Text style={styles.vsText}>

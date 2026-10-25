@@ -268,7 +268,7 @@ export const TeamsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.brandTeal} translucent />
+      <StatusBar barStyle="light-content" {...(Platform.OS === 'android' ? { backgroundColor: COLORS.brandTeal, translucent: true } : {})} />
       {/* Brand Top Header */}
       <View style={[styles.topHeader, { paddingTop: topInset + 10 }]}>
         <View style={styles.headerLeft}>

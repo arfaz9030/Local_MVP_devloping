@@ -179,7 +179,7 @@ export default function App() {
             <Trophy size={16} />
           </div>
           <span className="font-black text-sm tracking-tight text-white flex items-center gap-1.5">
-            CrickHeroes <span className="text-[10px] bg-[#007F78]/30 text-teal-300 px-1.5 py-0.5 rounded font-mono font-bold">MVP</span>
+            Match Day <span className="text-[10px] bg-[#007F78]/30 text-teal-300 px-1.5 py-0.5 rounded font-mono font-bold">MVP</span>
           </span>
         </div>
 

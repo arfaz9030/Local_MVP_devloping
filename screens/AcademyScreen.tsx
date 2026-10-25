@@ -17,7 +17,7 @@
 //   return (
 //     <View style={styles.container}>
 //       <View style={styles.card}>
-//         <Text style={styles.academyName}>CrickHero Elite Academy</Text>
+//         <Text style={styles.academyName}>Match Day Elite Academy</Text>
 //         <Text style={styles.tagline}>Train like a pro. Play like a champion.</Text>
 
 //         <Text style={styles.sectionTitle}>About</Text>
@@ -142,7 +142,7 @@ export default function AcademyScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.title}>CrickHero Elite Academy</Text>
+        <Text style={styles.title}>Match Day Elite Academy</Text>
         <Text style={styles.subtitle}>
           Train like a pro. Play like a champion.
         </Text>

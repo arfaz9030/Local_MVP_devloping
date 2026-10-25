@@ -31,7 +31,7 @@ export const MatchList: React.FC<MatchListProps> = ({
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
-            CrickHero MVP <span className="text-xs px-2 py-0.5 rounded-md bg-blue-600/20 text-blue-400 font-bold border border-blue-500/30">v1.0</span>
+            Match Day MVP <span className="text-xs px-2 py-0.5 rounded-md bg-blue-600/20 text-blue-400 font-bold border border-blue-500/30">v1.0</span>
           </h1>
           <p className="text-xs text-slate-400 mt-0.5">Live & recent cricket matches</p>
         </div>

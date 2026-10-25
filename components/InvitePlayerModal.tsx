@@ -77,7 +77,7 @@ export const InvitePlayerModal: React.FC<InvitePlayerModalProps> = ({
     try {
       await Share.share({
         title: `Invite to ${teamName}`,
-        message: `Join our cricket team "${teamName}" on CrickHero! (Team invitation demo share)`,
+        message: `Join our cricket team "${teamName}" on Match Day! (Team invitation demo share)`,
       });
     } catch (err: any) {
       console.error('Error sharing team link:', err);
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill as any,
   },
   keyboardAvoid: {
     width: '100%',

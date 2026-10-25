@@ -91,7 +91,7 @@
 //   return (
 //     <SafeAreaView style={styles.container}>
 //       <View style={styles.headerBlock}>
-//         <Text style={styles.header}>CrickHero MVP</Text>
+//         <Text style={styles.header}>Match Day MVP</Text>
 //         <Text style={styles.subHeader}>Live & recent matches</Text>
 //       </View>
 
@@ -316,7 +316,7 @@ export default function MatchListScreen() {
             <Icon source="menu" size={26} color="#FFFFFF" />
           </TouchableOpacity>
           <View style={styles.headerTextGroup}>
-            <Text style={styles.header}>CrickHero MVP</Text>
+            <Text style={styles.header}>Match Day MVP</Text>
             <Text style={styles.subHeader}>Live & recent matches</Text>
           </View>
         </View>

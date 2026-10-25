@@ -139,7 +139,7 @@ export const TeamPickerModal: React.FC<TeamPickerModalProps> = ({
               }}
             >
               <Icon source="plus-circle-outline" size={20} color={COLORS.brandTeal} />
-              <Text style={styles.createTeamBtnText}>Create New Team in CrickHero</Text>
+              <Text style={styles.createTeamBtnText}>Create New Team in Match Day</Text>
             </TouchableOpacity>
           ) : null}
 

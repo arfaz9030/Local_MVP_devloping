@@ -158,7 +158,7 @@ export const AcademyView: React.FC = () => {
         </a>
 
         <a
-          href="https://wa.me/917680922101?text=Hi%2C%20I%20am%20interested%20in%20joining%20CrickHero%20Elite%20Academy%20training%20batches."
+          href="https://wa.me/917680922101?text=Hi%2C%20I%20am%20interested%20in%20joining%20Match%20Day%20Elite%20Academy%20training%20batches."
           target="_blank"
           rel="noopener noreferrer"
           className="w-full py-3 bg-[#128C7E] hover:bg-[#0f7a6e] text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer text-center no-underline"

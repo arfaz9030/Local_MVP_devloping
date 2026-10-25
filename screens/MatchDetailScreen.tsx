@@ -95,6 +95,10 @@ export default function MatchDetailScreen() {
     });
   };
 
+  const handleBackToMatches = () => {
+    router.replace('/(tabs)');
+  };
+
   if (loading) {
     return (
       <View style={[styles.container, styles.centerContent]}>
@@ -115,7 +119,7 @@ export default function MatchDetailScreen() {
 
         <Pressable
           style={styles.tertiaryButton}
-          onPress={() => router.back()}
+          onPress={handleBackToMatches}
         >
           <Text style={styles.tertiaryButtonText}>Back to Matches</Text>
         </Pressable>
@@ -158,7 +162,7 @@ export default function MatchDetailScreen() {
 
       <Pressable
         style={styles.tertiaryButton}
-        onPress={() => router.back()}
+        onPress={handleBackToMatches}
       >
         <Text style={styles.tertiaryButtonText}>Back to Matches</Text>
       </Pressable>

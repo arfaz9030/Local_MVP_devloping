@@ -617,7 +617,7 @@ export default function CreateMatchScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: topInset }]}>
-      <StatusBar barStyle="light-content" translucent />
+      <StatusBar barStyle="light-content" {...(Platform.OS === 'android' ? { translucent: true } : {})} />
 
       {/* Red App Header (CrickHero brand header) */}
       <View style={styles.topHeader}>
@@ -636,7 +636,7 @@ export default function CreateMatchScreen() {
           style={styles.headerHelpBtn}
           onPress={() =>
             Alert.alert(
-              'CrickHero Match Setup',
+              'Match Day Match Setup',
               'Select existing teams, configure overs and conditions, verify officials, pick squads, captain & toss to begin scoring.'
             )
           }
@@ -684,7 +684,7 @@ export default function CreateMatchScreen() {
             <View style={styles.infoBanner}>
               <Icon source="shield-account" size={22} color={COLORS.brandTeal} />
               <Text style={styles.infoBannerText}>
-                Select two existing teams created in CrickHero to begin match setup.
+                Select two existing teams created in Match Day to begin match setup.
               </Text>
             </View>
 
@@ -698,7 +698,7 @@ export default function CreateMatchScreen() {
                 <Icon source="alert-circle-outline" size={48} color="#F87171" />
                 <Text style={styles.emptyTitle}>Could not load teams</Text>
                 <Text style={styles.emptySubtitle}>{teamsError}</Text>
-                <TouchableOpacity style={styles.emptyBtn} onPress={fetchTeamsList}>
+                <TouchableOpacity style={styles.emptyBtn} onPress={() => { fetchTeamsList(); }}>
                   <Text style={styles.emptyBtnText}>Retry Loading Teams</Text>
                 </TouchableOpacity>
               </View>
@@ -708,7 +708,7 @@ export default function CreateMatchScreen() {
                 <Icon source="account-group-outline" size={54} color={COLORS.textDarkSecondary} />
                 <Text style={styles.emptyTitle}>No Teams Available</Text>
                 <Text style={styles.emptySubtitle}>
-                  You need at least one team created in CrickHero to start a match. Please create your team first.
+                  You need at least one team created in Match Day to start a match. Please create your team first.
                 </Text>
                 <TouchableOpacity
                   style={styles.emptyBtn}

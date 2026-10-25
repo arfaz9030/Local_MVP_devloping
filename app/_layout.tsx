@@ -1,7 +1,7 @@
 import { getToken, registerUnauthorizedHandler, removeToken } from '@/src/auth/tokenService';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { StatusBar } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -79,7 +79,7 @@ export default function RootLayout() {
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       <SafeAreaProvider>
         <PaperProvider>
-          <StatusBar barStyle="light-content" translucent />
+          <StatusBar barStyle="light-content" {...(Platform.OS === 'android' ? { translucent: true } : {})} />
           <Stack
             screenOptions={{
               headerStyle: {

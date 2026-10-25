@@ -29,7 +29,7 @@ export default function TabLayout() {
         options={{
           title: 'Teams',
           tabBarIcon: ({ color, size }) => (
-            <Icon source="account-group-outline" size={size} color={color} />
+            <Icon source="account-group-outline" size={size} color={color as string} />
           ),
         }}
       />
@@ -38,7 +38,7 @@ export default function TabLayout() {
         options={{
           title: 'Matches',
           tabBarIcon: ({ color, size }) => (
-            <Icon source="trophy-outline" size={size} color={color} />
+            <Icon source="trophy-outline" size={size} color={color as string} />
           ),
         }}
       />
@@ -47,7 +47,7 @@ export default function TabLayout() {
         options={{
           title: 'Academy',
           tabBarIcon: ({ color, size }) => (
-            <Icon source="school-outline" size={size} color={color} />
+            <Icon source="school-outline" size={size} color={color as string} />
           ),
         }}
       />

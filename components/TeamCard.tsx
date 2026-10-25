@@ -79,7 +79,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({
     try {
       await Share.share({
         title: `Invite to ${team.name}`,
-        message: `Join our cricket team "${team.name}" on CrickHero! Captain: ${team.captainName} (Team invitation demo share)`,
+        message: `Join our cricket team "${team.name}" on Match Day! Captain: ${team.captainName} (Team invitation demo share)`,
       });
     } catch (err: any) {
       console.error('Error sharing team link:', err);

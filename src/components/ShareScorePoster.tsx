@@ -18,7 +18,7 @@ export const ShareScorePoster: React.FC<ShareScorePosterProps> = ({
   if (!isOpen) return null;
 
   const handleCopyText = () => {
-    const text = `🏏 *CrickHero Elite Academy Scorecard*\n🔥 ${match.team1Name} vs ${match.team2Name}\n📊 Score: ${match.runs}/${match.wickets} (${match.overs} ov)\n⚡ Status: ${match.status}\n📍 Hyderabad Gachibowli Hub`;
+    const text = `🏏 *Match Day Elite Academy Scorecard*\n🔥 ${match.team1Name} vs ${match.team2Name}\n📊 Score: ${match.runs}/${match.wickets} (${match.overs} ov)\n⚡ Status: ${match.status}\n📍 Hyderabad Gachibowli Hub`;
     navigator.clipboard?.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -42,7 +42,7 @@ export const ShareScorePoster: React.FC<ShareScorePosterProps> = ({
           {/* Academy Brand Header */}
           <div className="mb-4">
             <h3 className="text-[#FACC15] font-black text-sm tracking-widest uppercase mb-0.5 flex items-center justify-center gap-1.5">
-              <Sparkles size={14} className="text-yellow-400" /> CrickHero Elite Academy
+              <Sparkles size={14} className="text-yellow-400" /> Match Day Elite Academy
             </h3>
             <p className="text-xs text-slate-300 font-medium">Official Match Scorecard</p>
           </div>
