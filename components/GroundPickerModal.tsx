@@ -3,13 +3,12 @@ import {
   FlatList,
   Modal,
   Platform,
-  Pressable,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { Icon } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -71,7 +70,7 @@ export const GroundPickerModal: React.FC<GroundPickerModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View style={[styles.container, { paddingTop: topInset }]}>
-        {/* Red Header matching CrickHero design */}
+        {/* Red Header matching MatchDay design */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.backButton} onPress={onClose}>
             <Icon source="arrow-left" size={24} color={COLORS.surfaceWhite} />

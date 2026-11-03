@@ -1,5 +1,5 @@
 /**
- * CrickHeroes Frontend Auth Service integration file
+ * MatchDayes Frontend Auth Service integration file
  * Conforming to backend Spring Boot endpoints (e.g. REST API structure)
  */
 import { getToken, saveToken } from './tokenService';

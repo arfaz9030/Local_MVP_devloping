@@ -3,13 +3,12 @@ import {
   FlatList,
   Modal,
   Platform,
-  Pressable,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { Icon } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -150,7 +149,7 @@ export const AddOfficialModal: React.FC<AddOfficialModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={handleClose}>
       <View style={[styles.container, { paddingTop: topInset }]}>
-        {/* Header matching CrickHero red bar */}
+        {/* Header matching MatchDay red bar */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}

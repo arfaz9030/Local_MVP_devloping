@@ -1,5 +1,5 @@
 # AI Project Context
-## CrickHero
+## MatchDay
 
 Version: 1.0
 
@@ -11,7 +11,7 @@ Last Updated: July 2026
 
 # Purpose
 
-This document is the master context for every AI assistant working on the CrickHero project.
+This document is the master context for every AI assistant working on the MatchDay project.
 
 Every AI (ChatGPT, Google AI Studio, Perplexity, or future AI tools) should read and follow this document before generating code, making architectural decisions, reviewing code, or suggesting changes.
 
@@ -21,7 +21,7 @@ This document is the project's "single source of truth" for AI context.
 
 # Document Ownership
 
-This document provides the permanent project context for AI assistants working on the CrickHero project.
+This document provides the permanent project context for AI assistants working on the MatchDay project.
 
 It should be used together with:
 
@@ -60,7 +60,7 @@ This document does not define:
 
 Project Name
 
-CrickHero
+MatchDay
 
 Project Type
 

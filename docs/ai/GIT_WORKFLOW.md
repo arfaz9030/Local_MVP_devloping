@@ -1,4 +1,4 @@
-# CrickHero Git Workflow
+# MatchDay Git Workflow
 
 Version: 1.0
 
@@ -10,7 +10,7 @@ Last Updated: July 2026
 
 # Purpose
 
-This document defines the Git workflow for the CrickHero project.
+This document defines the Git workflow for the MatchDay project.
 
 Goals
 
@@ -23,7 +23,7 @@ Goals
 ---
 # Document Ownership
 
-This document defines Git workflow and version-control practices for the CrickHero project.
+This document defines Git workflow and version-control practices for the MatchDay project.
 
 It should be used together with:
 
@@ -441,7 +441,7 @@ If production issue occurs
 
 # Solo Developer Rules
 
-Since CrickHero is currently developed by a single developer
+Since MatchDay is currently developed by a single developer
 
 Always
 

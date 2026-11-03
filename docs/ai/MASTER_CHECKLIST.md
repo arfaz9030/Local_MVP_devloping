@@ -1,4 +1,4 @@
-# CrickHero Master Checklist
+# MatchDay Master Checklist
 
 **Version:** 1.0
 
@@ -28,7 +28,7 @@ This file should always reflect the latest project state.
 ---
 # Document Ownership
 
-This document is the daily execution and feature-completion dashboard for the CrickHero project.
+This document is the daily execution and feature-completion dashboard for the MatchDay project.
 
 It should be used together with:
 

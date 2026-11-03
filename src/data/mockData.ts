@@ -145,6 +145,6 @@ export const ACADEMY_INFO = {
   contact: {
     phone: '+91 76809 22101',
     whatsapp: '+91 76809 22101',
-    email: 'academy@crickheroes.local'
+    email: 'academy@MatchDayes.local'
   }
 };

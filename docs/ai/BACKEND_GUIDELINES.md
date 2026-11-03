@@ -1,4 +1,4 @@
-# CrickHero Backend Guidelines
+# MatchDay Backend Guidelines
 
 Version: 1.0
 
@@ -11,7 +11,7 @@ Framework: Spring Boot
 # Purpose
 
 This document defines the backend architecture, coding standards,
-package organization and development rules for the CrickHero backend.
+package organization and development rules for the MatchDay backend.
 
 Every backend developer and AI assistant must follow these standards.
 
@@ -155,7 +155,7 @@ com.crichero
 
 ├── enums
 
-└── CrickHeroApplication.java
+└── MatchDayApplication.java
 
 ---
 
@@ -163,7 +163,7 @@ com.crichero
 
 Place
 
-CrickHeroApplication.java
+MatchDayApplication.java
 
 inside the root package.
 

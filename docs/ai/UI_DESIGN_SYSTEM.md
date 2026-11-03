@@ -1,8 +1,8 @@
-# CrickHero Frontend Theme & Design Token Rules (System Prompt)
+# MatchDay Frontend Theme & Design Token Rules (System Prompt)
 
 ## Theme-First Development
 
-Whenever generating any React Native frontend code for CrickHero, always use the project's centralized design tokens.
+Whenever generating any React Native frontend code for MatchDay, always use the project's centralized design tokens.
 
 Never hardcode UI values when an existing design token should be used.
 

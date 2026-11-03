@@ -1,4 +1,4 @@
-# CrickHero Architecture Decision Log (ADR)
+# MatchDay Architecture Decision Log (ADR)
 
 **Version:** 1.0
 **Status:** Active
@@ -8,7 +8,7 @@
 
 # Purpose
 
-This document records all important technical and architectural decisions made during the CrickHero project.
+This document records all important technical and architectural decisions made during the MatchDay project.
 
 Every significant decision should answer:
 
@@ -23,7 +23,7 @@ This document is the single source of truth for architectural decisions.
 ---
 # Document Ownership
 
-This document records architectural and engineering decisions for the CrickHero project.
+This document records architectural and engineering decisions for the MatchDay project.
 
 It should be used together with:
 

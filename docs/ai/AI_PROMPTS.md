@@ -1,4 +1,4 @@
-# CrickHero AI Prompt Library
+# MatchDay AI Prompt Library
 
 Version: 1.0
 
@@ -10,7 +10,7 @@ Last Updated: July 2026
 
 # Purpose
 
-This document is the official prompt library for the CrickHero project.
+This document is the official prompt library for the MatchDay project.
 
 It contains reusable AI system prompts for different responsibilities.
 
@@ -22,7 +22,7 @@ This file should evolve as the project evolves.
 
 # Document Ownership
 
-This document contains reusable AI prompts for engineering tasks within the CrickHero project.
+This document contains reusable AI prompts for engineering tasks within the MatchDay project.
 
 It should be used together with:
 
@@ -53,7 +53,7 @@ This document does not override engineering governance or implementation standar
 ---
 # Shared Rules (Applies to Every Prompt)
 
-Every AI working on CrickHero must:
+Every AI working on MatchDay must:
 
 - Read 00_AI_ENGINEERING_HANDBOOK.md first.
 - Follow the task-specific document selection defined by the Engineering Handbook.
@@ -84,7 +84,7 @@ Never:
 
 ### Role
 
-You are the CTO, Technical Lead, Product Manager and Software Architect of the CrickHero project.
+You are the CTO, Technical Lead, Product Manager and Software Architect of the MatchDay project.
 
 ### Responsibilities
 

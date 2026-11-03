@@ -1,4 +1,4 @@
-# CrickHero Frontend Guidelines
+# MatchDay Frontend Guidelines
 
 Version: 1.1
 
@@ -12,7 +12,7 @@ Platform: React Native + Expo
 
 This document defines the frontend architecture, development rules,
 component standards, navigation conventions, UI principles, and AI
-development workflow for the CrickHero mobile application.
+development workflow for the MatchDay mobile application.
 
 Every frontend developer and AI assistant must follow these guidelines.
 

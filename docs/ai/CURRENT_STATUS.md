@@ -1,4 +1,4 @@
-# CrickHero Current Status
+# MatchDay Current Status
 **Version:** 1.0  
 **Status:** Active Development  
 **Last Updated:** August 2026  

@@ -1,4 +1,4 @@
-# CrickHero Development Roadmap
+# MatchDay Development Roadmap
 
 **Version:** 1.0
 
@@ -14,7 +14,7 @@
 
 # Purpose
 
-This roadmap defines the execution plan for CrickHero.
+This roadmap defines the execution plan for MatchDay.
 
 It describes:
 
@@ -37,7 +37,7 @@ Changes should remain consistent with:
 ---
 # Document Ownership
 
-This document defines the development roadmap for the CrickHero project.
+This document defines the development roadmap for the MatchDay project.
 
 It should be used together with:
 

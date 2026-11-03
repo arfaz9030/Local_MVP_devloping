@@ -1,4 +1,4 @@
-# CrickHero Coding Standards
+# MatchDay Coding Standards
 
 **Version:** 1.0
 
@@ -10,7 +10,7 @@
 
 # 1. Purpose
 
-This document defines the coding standards for the CrickHero project.
+This document defines the coding standards for the MatchDay project.
 
 Every contributor (human or AI) must follow these rules.
 
@@ -26,7 +26,7 @@ Objectives:
 
 # Document Ownership
 
-This document defines coding standards and code quality expectations for the CrickHero project.
+This document defines coding standards and code quality expectations for the MatchDay project.
 
 It should be used together with:
 

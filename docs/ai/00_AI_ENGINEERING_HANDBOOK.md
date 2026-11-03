@@ -1,6 +1,6 @@
 # 00_AI_ENGINEERING_HANDBOOK.md
 
-> **Engineering Constitution for the CrickHero Project**
+> **Engineering Constitution for the MatchDay Project**
 
 Version: **2.0**
 
@@ -50,7 +50,7 @@ Applies To:
 
 ## Design Goal
 
-This handbook defines the engineering governance for the CrickHero project.
+This handbook defines the engineering governance for the MatchDay project.
 
 It intentionally avoids implementation-specific guidance.
 
@@ -109,7 +109,7 @@ Every AI assistant should follow this order:
 
 # 1. Purpose
 
-The Engineering Handbook is the governance document for the CrickHero project.
+The Engineering Handbook is the governance document for the MatchDay project.
 
 It establishes:
 
@@ -530,7 +530,7 @@ Before modifying any project document:
 
 # Part II — AI Operating Model
 
-The AI Operating Model defines how every AI assistant should work within the CrickHero project.
+The AI Operating Model defines how every AI assistant should work within the MatchDay project.
 
 It provides a consistent process for:
 
@@ -878,7 +878,7 @@ For AI response templates and reusable prompts, see:
 End of Part II — AI Operating Model
 # Part III — Development Workflows
 
-This part defines the standard engineering workflows used throughout the CrickHero project.
+This part defines the standard engineering workflows used throughout the MatchDay project.
 
 These workflows describe **how work progresses** from requirement to completion.
 
@@ -1302,7 +1302,7 @@ for branching strategy, commit conventions and repository standards.
 End of Part III — Development Workflows
 # Part IV — Engineering Rules
 
-This part defines the mandatory engineering rules for the CrickHero project.
+This part defines the mandatory engineering rules for the MatchDay project.
 
 These rules are the **single source of truth** for engineering practices.
 
@@ -2312,7 +2312,7 @@ AI operating model:
 End of Part V — Quality Gates
 # Part VI — AI Decision Framework
 
-This part defines how AI assistants should make engineering decisions while working on the CrickHero project.
+This part defines how AI assistants should make engineering decisions while working on the MatchDay project.
 
 Unlike the Engineering Rules, which define mandatory requirements, the AI Decision Framework defines the reasoning process AI should follow before generating code.
 

@@ -1,4 +1,4 @@
-# CrickHero API Contract
+# MatchDay API Contract
 
 **Version:** 1.1
 

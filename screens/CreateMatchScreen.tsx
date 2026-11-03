@@ -1,5 +1,5 @@
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -19,8 +19,8 @@ import {
 import { Icon } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddOfficialModal, OfficialMember, OfficialRole } from '../components/AddOfficialModal';
-import { InvitePlayerModal } from '../components/InvitePlayerModal';
 import { GroundPickerModal } from '../components/GroundPickerModal';
+import { InvitePlayerModal } from '../components/InvitePlayerModal';
 import { TeamItem } from '../components/TeamCard';
 import { TeamPickerModal } from '../components/TeamPickerModal';
 import { createMatch, getTeams } from '../src/api/matchApi';
@@ -29,7 +29,7 @@ import { FONT_SIZE, FONT_WEIGHT } from '../src/theme/typography';
 
 // Stages in the Start Match flow (guided by the 18 screenshots + Team Selection Entry)
 export type MatchSetupStage =
-  | 'TEAM_SELECT' // Step 1: Select Team 1 & Team 2 from actual CrickHero teams
+  | 'TEAM_SELECT' // Step 1: Select Team 1 & Team 2 from actual MatchDay teams
   | 'SETTINGS' // Step 2 (Screens 1, 3): Match settings, overs, ground
   | 'OFFICIALS' // Step 3 (Screens 2, 4-11): Umpires, scorers, commentators
   | 'SQUADS' // Step 4 (Screens 11-post, 12, 13, 14): Playing XI selection
@@ -160,12 +160,12 @@ export default function CreateMatchScreen() {
           logoUrl: t.logoUrl,
           players: Array.isArray(t.players)
             ? t.players.map((p: any) => ({
-                id: String(p.id),
-                name: p.name,
-                jerseyNumber: p.jerseyNumber,
-                role: p.role,
-                mobileNumber: p.mobileNumber,
-              }))
+              id: String(p.id),
+              name: p.name,
+              jerseyNumber: p.jerseyNumber,
+              role: p.role,
+              mobileNumber: p.mobileNumber,
+            }))
             : [],
         }));
         setTeams(formattedTeams);
@@ -236,13 +236,13 @@ export default function CreateMatchScreen() {
     const fullTeam = sourceTeams.find((t) => t.id === selectedTeam.id || t.name === selectedTeam.name);
     const loadedPlayers: SquadPlayer[] = fullTeam?.players
       ? fullTeam.players.map((p) => ({
-          id: String(p.id),
-          name: p.name,
-          jerseyNumber: p.jerseyNumber,
-          role: p.role || 'Player',
-          battingStyle: 'Right Hand Bat',
-          bowlingStyle: 'Right-arm Medium',
-        }))
+        id: String(p.id),
+        name: p.name,
+        jerseyNumber: p.jerseyNumber,
+        role: p.role || 'Player',
+        battingStyle: 'Right Hand Bat',
+        bowlingStyle: 'Right-arm Medium',
+      }))
       : [];
 
     if (target === 'team1') {
@@ -619,7 +619,7 @@ export default function CreateMatchScreen() {
     <View style={[styles.container, { paddingTop: topInset }]}>
       <StatusBar barStyle="light-content" {...(Platform.OS === 'android' ? { translucent: true } : {})} />
 
-      {/* Red App Header (CrickHero brand header) */}
+      {/* Red App Header (MatchDay brand header) */}
       <View style={styles.topHeader}>
         <TouchableOpacity style={styles.headerBackBtn} onPress={handleBack}>
           <Icon source="arrow-left" size={24} color={COLORS.surfaceWhite} />
@@ -1482,7 +1482,7 @@ export default function CreateMatchScreen() {
               >
                 <Text style={styles.toggleAllText}>
                   {(activeSquadTab === 'team1' ? team1SelectedPlayerIds.length : team2SelectedPlayerIds.length) ===
-                  (activeSquadTab === 'team1' ? team1Players.length : team2Players.length)
+                    (activeSquadTab === 'team1' ? team1Players.length : team2Players.length)
                     ? 'Deselect All'
                     : 'Select All'}
                 </Text>
@@ -2218,8 +2218,8 @@ export default function CreateMatchScreen() {
                   {openerPickerModal === 'striker'
                     ? 'Select Striker'
                     : openerPickerModal === 'nonStriker'
-                    ? 'Select Non-Striker'
-                    : 'Select Opening Bowler'}
+                      ? 'Select Non-Striker'
+                      : 'Select Opening Bowler'}
                 </Text>
                 <TouchableOpacity onPress={() => setOpenerPickerModal(null)}>
                   <Icon source="close" size={20} color={COLORS.surfaceWhite} />

@@ -1,4 +1,4 @@
-# CrickHero Project Overview
+# MatchDay Project Overview
 **Version:** 1.0  
 **Status:** Active Development (MVP)  
 **Owner:** Mohammad Arfaz Shaik  
@@ -8,7 +8,7 @@
 
 # 1. Project Vision
 
-CrickHero is a modern mobile application built to simplify cricket scoring, team management, player statistics, and match organization.
+MatchDay is a modern mobile application built to simplify cricket scoring, team management, player statistics, and match organization.
 
 The objective is to provide a fast, intuitive, and reliable experience for players, organizers, scorers, and cricket enthusiasts.
 

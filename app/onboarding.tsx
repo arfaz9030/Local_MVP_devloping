@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Alert, Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Button, Dialog, Portal, Text } from 'react-native-paper';
 import OTPInput from '../components/OTPInput';
@@ -119,7 +119,7 @@ export default function OnboardingScreen() {
               <View style={styles.logoBallIcon}>
                 <View style={styles.cricketBallSeam} />
               </View>
-              <Text style={styles.logoMainText}>cricheroes</Text>
+              <Text style={styles.logoMainText}>MatchDay</Text>
               <Text style={styles.logoTagline}>Your cricket matters</Text>
             </View>
 
@@ -147,7 +147,7 @@ export default function OnboardingScreen() {
         <View style={styles.centeredView} id="step-truecaller">
           <View style={styles.topBrandLogo}>
             <View style={styles.redIconBadge} />
-            <Text style={styles.brandTitleText}>cricheroes</Text>
+            <Text style={styles.brandTitleText}>MatchDay</Text>
             <Text style={styles.brandSubtitleText}>Your cricket matters</Text>
           </View>
 
@@ -179,7 +179,7 @@ export default function OnboardingScreen() {
               </Dialog.Content>
               <View style={styles.tcFooter}>
                 <Text style={styles.tcFooterDisclaimer}>
-                  By continuing you consent to share your Truecaller profile information with CricHeroes.
+                  By continuing you consent to share your Truecaller profile information with MatchDay.
                 </Text>
                 <Text style={styles.tcInstantVerify}>Instant Verification by Truecaller</Text>
               </View>
@@ -193,7 +193,7 @@ export default function OnboardingScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} id="step-login-options">
           <View style={styles.topBrandLogo}>
             <View style={styles.redIconBadge} />
-            <Text style={styles.brandTitleText}>cricheroes</Text>
+            <Text style={styles.brandTitleText}>MatchDay</Text>
             <Text style={styles.brandSubtitleText}>Your cricket matters</Text>
           </View>
 
