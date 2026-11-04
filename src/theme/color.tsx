@@ -34,4 +34,14 @@ export const COLORS = {
   textDark: '#1E293B',
   textDarkSecondary: '#64748B', // Slate Grey (secondary text)
   placeholder: '#64748B',
+
+  // Cricket live scoring & ball indicator tokens
+  boundaryFour: '#F59E0B', // Amber for Four
+  boundarySix: '#84CC16', // Lime for Six
+  ballWicket: '#EF4444', // Red for Wicket
+  ballWide: '#0284C7', // Sky Blue for Extras
+  keypadBg: '#FFFFFF', // White keypad surface
+  keypadBorder: '#E2E8F0', // Keypad divider borders
+  keypadText: '#1E293B', // Main digit text
+  overlayDark: 'rgba(0, 0, 0, 0.65)',
 };

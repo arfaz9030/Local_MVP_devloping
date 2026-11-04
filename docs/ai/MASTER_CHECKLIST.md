@@ -220,32 +220,36 @@ Status
 
 # Phase 6 — Live Scoring
 
-- [ ] Runs
-- [ ] Wickets
-- [ ] Extras
-- [ ] Strike Rotation
-- [ ] Bowling Figures
-- [ ] Undo Ball
-- [ ] Over Complete
+- [x] Runs (0, 1, 2, 3, 4, 6 and 5, 7 extra runs)
+- [x] Wickets (Fall of wicket with dismissal types & incoming batsman via WicketModal)
+- [x] Extras (Wide, No-Ball with non-legal ball count, Bye, Leg-Bye)
+- [x] Strike Rotation (automatic on odd runs 1, 3, 5, 7 and at end of each over)
+- [x] Bowling Figures (O.B-M-R-W calculation and live updates)
+- [x] Undo Ball (complete state snapshot restoration via history stack)
+- [x] Over Complete (triggered at 6 legal balls with summary cards, ball sequence, Start Next Over & Continue This Over)
+- [x] Scoring Shortcuts Bottom Sheet (8-item grid + More shortcuts)
+- [x] Match Header (back navigation, team title, native Share.share, settings)
+- [x] Background API Sync (calls addScore API asynchronously with floating Synced toast)
 
 Status
 
-⬜ Not Started
+✅ Frontend Complete (Backend persistent ball-by-ball events pending)
 
 ---
 
 # Phase 7 — Scoreboard
 
-- [ ] Live Score
-- [ ] Batting Card
-- [ ] Bowling Card
+- [x] Live Score (Large hero score digits and overs format matching Screenshot 1 & 4)
+- [x] Batting Card (Striker active indicator, runs, balls, 4s, 6s, strike rate, and Replace link)
+- [x] Bowling Card (Bowler figures, overs, maidens, runs, wickets, economy)
+- [x] Fall Of Wickets (Tracked via dismissal history and full scorecard)
+- [x] Full Innings Scorecard Modal (Batting stats, bowling analysis, extras breakdown)
 - [ ] Partnerships
-- [ ] Fall Of Wickets
 - [ ] Match Statistics
 
 Status
 
-⬜ Not Started
+🟡 Substantially Complete (Frontend live scorecard modal active)
 
 ---
 

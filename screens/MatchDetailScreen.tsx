@@ -153,7 +153,7 @@ export default function MatchDetailScreen() {
       </View>
 
       <Pressable style={styles.primaryButton} onPress={handleAddScore}>
-        <Text style={styles.primaryButtonText}>Add Score</Text>
+        <Text style={styles.primaryButtonText}>Live Scoring & Ball-by-Ball</Text>
       </Pressable>
 
       <Pressable style={styles.secondaryButton} onPress={handleShareScore}>

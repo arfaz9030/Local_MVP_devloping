@@ -4,6 +4,8 @@ export const FONT_SIZE = {
   md: 16,
   lg: 18,
   xl: 28,
+  xxl: 36,
+  hero: 48,
 };
 
 export const FONT_WEIGHT = {

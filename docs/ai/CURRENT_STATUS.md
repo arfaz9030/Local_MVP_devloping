@@ -93,11 +93,13 @@ Complete Teams + Players Module (frontend and backend integration).
   - Captain & Wicket Keeper selection screen with dual `[ C ]` and `[ WK ]` toggle controls
   - Interactive Toss screen with Team vs Team cards, interactive coin flip, and BAT/BOWL decision cards
   - Openers selection (Striker, Non-Striker, Opening Bowler) with batting/bowling style tags, match overview, and Start Scoring integration
-- [x] Phase 1 Navigation Fixes:
-  - Drawer direction corrected: AppDrawer now opens strictly from the left edge sliding towards the right (`translateX` from `-DRAWER_WIDTH` to `0`) with overlay backdrop positioned on the right.
-  - Start Match exit navigation: Exiting the match creation flow at `TEAM_SELECT` returns directly to the main Matches tab (`/(tabs)`) displaying the full matches list.
-  - Tab navigator initial route: Configured `initialRouteName="index"` in `app/(tabs)/_layout.tsx` ensuring `/(tabs)` reliably targets the Matches tab rather than defaulting to the first listed tab.
-  - Android hardware Back handling: Implemented scoped `BackHandler` listeners in `CreateMatchScreen` and `TeamsScreen` prioritizing active modal dismissal, wizard stage regression, and clean exit without double-navigation or unintended route pops.
+- [x] Live Cricket Scoring Screen (Frontend Only):
+  - Screen 1: Mobile Live Scoring Screen with header (back, team title, share score, settings), hero score summary (runs/wickets, overs/maxOvers, toss info, Match ID copy), compact horizontal batters card (striker active indicator, replace action, balls faced), bowler figures bar (`O.B-M-R-W`), and ball-by-ball delivery sequence
+  - Screen 2: Scoring Shortcuts Bottom Sheet (`ScoringShortcutsSheet.tsx`) with 8-item grid (Need Help, Match Rules, Change Scorer, Change Squad, Full Scorecard, Match Overs, Replace Batters, Bonus Runs) and More shortcuts
+  - Screen 3: Scoring Keypad Controls with full cricket scoring rules: dots (`0`), singles/runs (`1`, `2`, `3`, `4`, `6`), extras (`WD`, `NB` non-legal ball count, `BYE`, `LB`), fall of wicket (`OUT` with `WicketModal.tsx` for dismissal type and incoming batsman), reversible `UNDO` with history stack, odd-run strike rotation, and async background sync with `✓ Synced` toast
+  - Screen 4: Over Completion Bottom Sheet (`OverCompleteSheet.tsx`) triggered strictly on 6 legal deliveries, displaying runs, overs, wickets, extras, color-coded ball sequence, and actions for Start Next Over and Continue This Over
+  - Full Innings Scorecard Modal (`FullScorecardModal.tsx`) with detailed batting scorecard, bowling analysis, and extras breakdown
+  - Design system tokens: Added semantic cricket scoring tokens (`boundaryFour`, `boundarySix`, `ballWicket`, `ballWide`, `keypadBg`, `keypadBorder`, `keypadText`, `overlayDark`, `hero`, `xxl`) to centralized theme without hardcoding
 
 ### In Progress
 
