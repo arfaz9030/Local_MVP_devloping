@@ -20,7 +20,7 @@ export default function ProfileScreen() {
           </View>
         </View>
         <Text style={styles.userName}>Arfaz Mohammad</Text>
-        <Text style={styles.userRole}>Pro Batsman | Elite CricHeroes Member</Text>
+        <Text style={styles.userRole}>Pro Batsman | Elite Match Day Member</Text>
       </Surface>
 
       {/* Account Info Section */}

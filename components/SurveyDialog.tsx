@@ -26,7 +26,7 @@ export default function SurveyDialog({ visible, onDismiss, onStartSurvey }: Surv
           />
           <View style={styles.logoOverlay}>
             <View style={styles.logoIconSmall} />
-            <Text style={styles.logoText}>cricheroes</Text>
+            <Text style={styles.logoText}>Match Day</Text>
             <Text style={styles.logoSub}>Your cricket matters</Text>
           </View>
         </View>
@@ -34,7 +34,7 @@ export default function SurveyDialog({ visible, onDismiss, onStartSurvey }: Surv
         <Dialog.Content style={styles.content}>
           <Text style={styles.title}>Help us improve</Text>
           <Text style={styles.desc}>
-            We'd love to understand how CricHeroes is helping your game and where we can improve the experience further.
+            We'd love to understand how Match Day is helping your game and where we can improve the experience further.
           </Text>
 
           <Button
