@@ -34,6 +34,7 @@ interface FullScorecardModalProps {
     byes: number;
     legByes: number;
   };
+  ballsPerOver?: number;
   onClose: () => void;
 }
 
@@ -53,11 +54,12 @@ export const FullScorecardModal: React.FC<FullScorecardModalProps> = ({
   dismissedBatters,
   allCompletedOvers,
   extrasBreakdown,
+  ballsPerOver = 6,
   onClose,
 }) => {
   const currentOverString = `${completedOvers}.${currentOverBalls}`;
-  const totalBalls = completedOvers * 6 + currentOverBalls;
-  const currentRunRate = totalBalls > 0 ? ((totalRuns / totalBalls) * 6).toFixed(2) : '0.00';
+  const totalBalls = completedOvers * ballsPerOver + currentOverBalls;
+  const currentRunRate = totalBalls > 0 ? ((totalRuns / totalBalls) * ballsPerOver).toFixed(2) : '0.00';
   const totalExtras =
     extrasBreakdown.wides +
     extrasBreakdown.noBalls +
@@ -181,11 +183,11 @@ export const FullScorecardModal: React.FC<FullScorecardModalProps> = ({
                 {bowler.wickets}
               </Text>
               <Text style={[styles.colValue, styles.colRight]}>
-                {bowler.oversCompleted * 6 + bowler.currentOverBalls > 0
+                {bowler.oversCompleted * ballsPerOver + bowler.currentOverBalls > 0
                   ? (
                       (bowler.runsConceded /
-                        (bowler.oversCompleted * 6 + bowler.currentOverBalls)) *
-                      6
+                        (bowler.oversCompleted * ballsPerOver + bowler.currentOverBalls)) *
+                      ballsPerOver
                     ).toFixed(2)
                   : '0.00'}
               </Text>

@@ -158,12 +158,21 @@ export const SelectBowlerModal: React.FC<SelectBowlerModalProps> = ({
           {/* Bowler Candidates List */}
           <Text style={styles.sectionLabel}>Available Bowlers ({fieldingTeamName})</Text>
 
-          <ScrollView
-            style={styles.bowlerList}
-            contentContainerStyle={styles.bowlerListContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {fieldingSquad.map((player) => {
+          {fieldingSquad.length === 0 ? (
+            <View style={styles.emptySquadCard}>
+              <Icon source="account-alert-outline" size={26} color={COLORS.textDarkSecondary} />
+              <Text style={styles.emptySquadTitle}>No Registered Bowlers Found</Text>
+              <Text style={styles.emptySquadText}>
+                No players are registered in {fieldingTeamName}'s squad. You can type and assign a bowler from {fieldingTeamName} below.
+              </Text>
+            </View>
+          ) : (
+            <ScrollView
+              style={styles.bowlerList}
+              contentContainerStyle={styles.bowlerListContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {fieldingSquad.map((player) => {
               const normPlayer = normalize(player.name);
               const isConsecutive =
                 precedingBowlerName && normalize(precedingBowlerName) === normPlayer;
@@ -238,6 +247,7 @@ export const SelectBowlerModal: React.FC<SelectBowlerModalProps> = ({
               );
             })}
           </ScrollView>
+          )}
 
           {/* Custom Bowler Fallback */}
           <View style={styles.customSection}>
@@ -495,5 +505,28 @@ const styles = StyleSheet.create({
     color: COLORS.surfaceWhite,
     fontSize: FONT_SIZE.sm,
     fontWeight: FONT_WEIGHT.bold,
+  },
+  emptySquadCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
+    padding: 16,
+    marginBottom: 10,
+  },
+  emptySquadTitle: {
+    fontSize: FONT_SIZE.sm,
+    fontWeight: FONT_WEIGHT.bold,
+    color: COLORS.textDark,
+    marginTop: 6,
+    marginBottom: 4,
+  },
+  emptySquadText: {
+    fontSize: FONT_SIZE.xs,
+    color: COLORS.textDarkSecondary,
+    textAlign: 'center',
+    lineHeight: 16,
   },
 });

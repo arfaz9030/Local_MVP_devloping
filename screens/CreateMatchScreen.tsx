@@ -47,6 +47,7 @@ export interface SquadPlayer {
 }
 
 const OVERS_OPTIONS = [5, 8, 10, 12, 15, 20];
+const BALLS_PER_OVER_OPTIONS = [3, 4, 6, 8];
 const BALL_TYPES = ['Tennis', 'Leather', 'Rubber / Tape'];
 const PITCH_TYPES = ['Turf', 'Matting', 'Cement', 'Rough'];
 const MATCH_TYPES = ['Limited Overs', 'Box Cricket', 'Test Match'];
@@ -84,6 +85,7 @@ export default function CreateMatchScreen() {
   const [cityLocation, setCityLocation] = useState<string>('Hyderabad (Telangana)');
   const [matchDateTime, setMatchDateTime] = useState<string>('Today, 04:00 PM');
   const [oversPerBowler, setOversPerBowler] = useState<number>(2);
+  const [ballsPerOver, setBallsPerOver] = useState<number>(6);
 
   // Modal pickers
   const [teamPickerMode, setTeamPickerMode] = useState<'team1' | 'team2' | null>(null);
@@ -529,6 +531,14 @@ export default function CreateMatchScreen() {
         team2Name: team2!.name.trim(),
       });
 
+      const selectedStriker = battingPlayers.find((p) => p.id === strikerId)?.name || '';
+      const selectedNonStriker = battingPlayers.find((p) => p.id === nonStrikerId)?.name || '';
+      const selectedBowler = bowlingPlayers.find((p) => p.id === openingBowlerId)?.name || '';
+      const actualBattingTeamId = (battingTeam === 'team1' ? team1?.id : team2?.id) || '';
+      const actualFieldingTeamId = (bowlingTeam === 'team1' ? team1?.id : team2?.id) || '';
+      const actualBattingTeamName = battingTeam === 'team1' ? team1!.name : team2!.name;
+      const actualFieldingTeamName = bowlingTeam === 'team1' ? team1!.name : team2!.name;
+
       Alert.alert(
         'Match Started!',
         `Match created successfully! ID: ${match.matchId}. You can now score ball-by-ball.`,
@@ -546,6 +556,18 @@ export default function CreateMatchScreen() {
                   wickets: '0',
                   overs: '0.0',
                   status: 'LIVE',
+                  totalOvers: String(selectedOvers),
+                  oversPerBowler: String(oversPerBowler),
+                  ballsPerOver: String(ballsPerOver),
+                  team1Id: team1?.id || '',
+                  team2Id: team2?.id || '',
+                  battingTeamId: actualBattingTeamId,
+                  fieldingTeamId: actualFieldingTeamId,
+                  battingTeamName: actualBattingTeamName,
+                  fieldingTeamName: actualFieldingTeamName,
+                  strikerName: selectedStriker,
+                  nonStrikerName: selectedNonStriker,
+                  bowlerName: selectedBowler,
                 },
               });
             },
@@ -1006,6 +1028,45 @@ export default function CreateMatchScreen() {
                   <TouchableOpacity
                     style={styles.stepperBtn}
                     onPress={() => setOversPerBowler((prev) => prev + 1)}
+                  >
+                    <Icon source="plus" size={18} color={COLORS.surfaceWhite} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Balls Per Over (Dynamic Over Count) */}
+              <Text style={[styles.fieldHeading, { marginTop: 14 }]}>Balls per Over</Text>
+              <View style={styles.pillsRow}>
+                {BALLS_PER_OVER_OPTIONS.map((b) => {
+                  const isSelected = ballsPerOver === b;
+                  return (
+                    <TouchableOpacity
+                      key={b}
+                      style={[styles.pill, isSelected && styles.pillActive]}
+                      onPress={() => setBallsPerOver(b)}
+                    >
+                      <Text style={[styles.pillText, isSelected && styles.pillTextActive]}>
+                        {b} Balls
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {/* Custom Balls Per Over Stepper */}
+              <View style={styles.stepperRow}>
+                <Text style={styles.stepperLabel}>Custom Balls/Over:</Text>
+                <View style={styles.stepperControls}>
+                  <TouchableOpacity
+                    style={styles.stepperBtn}
+                    onPress={() => setBallsPerOver((prev) => Math.max(1, prev - 1))}
+                  >
+                    <Icon source="minus" size={18} color={COLORS.surfaceWhite} />
+                  </TouchableOpacity>
+                  <Text style={styles.stepperVal}>{ballsPerOver}</Text>
+                  <TouchableOpacity
+                    style={styles.stepperBtn}
+                    onPress={() => setBallsPerOver((prev) => Math.min(12, prev + 1))}
                   >
                     <Icon source="plus" size={18} color={COLORS.surfaceWhite} />
                   </TouchableOpacity>

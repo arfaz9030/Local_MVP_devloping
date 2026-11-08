@@ -21,6 +21,7 @@ interface OverCompleteSheetProps {
   wicketsInOver: number;
   extrasInOver: number;
   deliveries: Delivery[];
+  ballsPerOver?: number;
   onStartNextOver: () => void;
   onContinueThisOver: () => void;
   onOpenSettings?: () => void;
@@ -34,6 +35,7 @@ export const OverCompleteSheet: React.FC<OverCompleteSheetProps> = ({
   wicketsInOver,
   extrasInOver,
   deliveries,
+  ballsPerOver = 6,
   onStartNextOver,
   onContinueThisOver,
   onOpenSettings,
@@ -106,7 +108,7 @@ export const OverCompleteSheet: React.FC<OverCompleteSheetProps> = ({
 
           {/* Subtitle */}
           <Text style={styles.subtext}>
-            End of over {overNumber} by {bowlerName || 'Bowler'}
+            End of over {overNumber} by {bowlerName || 'Bowler'} • {ballsPerOver} legal balls
           </Text>
 
           {/* Ball-by-ball Sequence */}

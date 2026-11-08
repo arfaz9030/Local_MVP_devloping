@@ -48,17 +48,13 @@ export default function App() {
   const [strikerBalls, setStrikerBalls] = useState(3);
   const [nonStrikerRuns, setNonStrikerRuns] = useState(7);
   const [nonStrikerBalls, setNonStrikerBalls] = useState(3);
-  const [bowlerFigures, setBowlerFigures] = useState({ overs: '0.4', maidens: '0', runs: '15', wickets: '0' });
-  const [activeBowler, setActiveBowler] = useState('Rafah');
+  const [ballsPerOver, setBallsPerOver] = useState(6);
+  const [bowlerFigures, setBowlerFigures] = useState({ overs: '0.0', maidens: '0', runs: '0', wickets: '0' });
+  const [activeBowler, setActiveBowler] = useState('Opening Bowler');
+  const [strikerName, setStrikerName] = useState('Striker 1');
   const [precedingBowler, setPrecedingBowler] = useState<string | null>(null);
   const [maxOversPerBowler, setMaxOversPerBowler] = useState(2);
-  const [bowlerRecords, setBowlerRecords] = useState<Record<string, { overs: number; runs: number; wickets: number }>>({
-    Rafah: { overs: 0, runs: 15, wickets: 0 },
-    'Tanveer Ali': { overs: 0, runs: 0, wickets: 0 },
-    'Zeeshan Khan': { overs: 0, runs: 0, wickets: 0 },
-    'Imran Malik': { overs: 0, runs: 0, wickets: 0 },
-    'Shahid Afridi Jr': { overs: 0, runs: 0, wickets: 0 },
-  });
+  const [bowlerRecords, setBowlerRecords] = useState<Record<string, { overs: number; runs: number; wickets: number }>>({});
   const [isSelectBowlerOpen, setIsSelectBowlerOpen] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
@@ -154,7 +150,7 @@ export default function App() {
 
     // Check legal delivery over complete
     const legalCount = nextBalls.filter((b) => b !== 'WD' && b !== 'NB').length;
-    if (legalCount >= 6) {
+    if (legalCount >= ballsPerOver) {
       setIsOverCompleteOpen(true);
     }
 
@@ -335,7 +331,7 @@ export default function App() {
                     🏏
                   </div>
                   <span className="text-xs font-bold text-white truncate">
-                    A-1 Children Sweets
+                    {strikerName}
                   </span>
                 </div>
                 <div className="text-sm font-bold text-slate-200 mt-1 pl-8">
@@ -546,7 +542,9 @@ export default function App() {
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-500 mb-4">End of over by Rafah</p>
+                  <p className="text-xs text-slate-500 mb-4">
+                    End of over by {activeBowler} • {ballsPerOver} legal balls
+                  </p>
 
                   <button
                     onClick={handleNextOver}
@@ -596,7 +594,16 @@ export default function App() {
                   )}
 
                   <div className="space-y-2 overflow-y-auto max-h-60 pr-1">
-                    {['Rafah', 'Tanveer Ali', 'Zeeshan Khan', 'Imran Malik', 'Shahid Afridi Jr'].map((name) => {
+                    {(() => {
+                      const opponentTeam = teams.find(
+                        (t) => t.name.toLowerCase() === activeScoringMatch?.team2Name.toLowerCase()
+                      );
+                      const squadNames =
+                        opponentTeam?.players && opponentTeam.players.length > 0
+                          ? opponentTeam.players.map((p) => p.name)
+                          : ['Opening Bowler', 'Change Bowler 1', 'Change Bowler 2', 'Spinner 1'];
+
+                      return squadNames.map((name) => {
                       const isConsecutive = name === precedingBowler;
                       const oversBowled = bowlerRecords[name]?.overs || 0;
                       const isQuotaFull = oversBowled >= maxOversPerBowler;
@@ -636,7 +643,8 @@ export default function App() {
                           )}
                         </div>
                       );
-                    })}
+                    });
+                  })()}
                   </div>
                 </div>
               </div>

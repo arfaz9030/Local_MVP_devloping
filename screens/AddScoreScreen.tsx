@@ -31,7 +31,7 @@ import {
   ScoringStateSnapshot,
 } from '../components/scoring/types';
 import { WicketModal } from '../components/scoring/WicketModal';
-import { addScore } from '../src/api/matchApi';
+import { addScore, getTeams } from '../src/api/matchApi';
 import { COLORS } from '../src/theme/color';
 import { FONT_SIZE, FONT_WEIGHT } from '../src/theme/typography';
 
@@ -48,6 +48,16 @@ type AddScoreProps = {
   totalOvers?: string;
   oversPerBowler?: string;
   ballsPerOver?: string;
+  team1Id?: string;
+  team2Id?: string;
+  battingTeamId?: string;
+  fieldingTeamId?: string;
+  battingTeamName?: string;
+  fieldingTeamName?: string;
+  strikerName?: string;
+  nonStrikerName?: string;
+  bowlerName?: string;
+  targetRuns?: string;
 };
 
 export default function AddScoreScreen({
@@ -61,6 +71,16 @@ export default function AddScoreScreen({
   totalOvers = '5',
   oversPerBowler,
   ballsPerOver: initialBallsPerOver = '6',
+  team1Id,
+  team2Id,
+  battingTeamId,
+  fieldingTeamId,
+  battingTeamName: propBattingTeamName,
+  fieldingTeamName: propFieldingTeamName,
+  strikerName,
+  nonStrikerName,
+  bowlerName,
+  targetRuns,
 }: AddScoreProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -70,8 +90,8 @@ export default function AddScoreScreen({
 
   // Active teams display
   const effectiveMatchId = matchId || '28064593';
-  const battingTeamName = team1Name || 'Hero';
-  const bowlingTeamName = team2Name || 'Opponents';
+  const battingTeamName = propBattingTeamName || team1Name || 'Batting Team';
+  const bowlingTeamName = propFieldingTeamName || team2Name || 'Fielding Team';
   const matchMaxOvers = parseInt(totalOvers, 10) || 5;
   const configuredBallsPerOver = parseInt(initialBallsPerOver, 10) || 6;
   const configuredOversPerBowler =
@@ -93,10 +113,15 @@ export default function AddScoreScreen({
   const [ballsPerOver, setBallsPerOver] = useState<number>(configuredBallsPerOver);
   const [maxOversPerBowler, setMaxOversPerBowler] = useState<number>(configuredOversPerBowler);
 
+  // Real teams data from API
+  const [realFieldingSquad, setRealFieldingSquad] = useState<SquadPlayerItem[]>([]);
+  const [realBattingPlayerNames, setRealBattingPlayerNames] = useState<string[]>([]);
+
   // Cumulative bowler stats across match
+  const initialBowlerName = bowlerName?.trim() || 'Bowler 1';
   const [bowlerRecords, setBowlerRecords] = useState<Record<string, BowlerRecord>>({
-    Rafah: {
-      name: 'Rafah',
+    [initialBowlerName]: {
+      name: initialBowlerName,
       oversCompleted: 0,
       maidens: 0,
       runsConceded: 0,
@@ -108,7 +133,7 @@ export default function AddScoreScreen({
 
   // 2. Batters & Bowler State
   const [striker, setStriker] = useState<BatterStats>({
-    name: 'A-1 Children Sweets',
+    name: strikerName?.trim() || 'Striker 1',
     runs: 0,
     balls: 0,
     fours: 0,
@@ -117,7 +142,7 @@ export default function AddScoreScreen({
   });
 
   const [nonStriker, setNonStriker] = useState<BatterStats>({
-    name: 'Mohammad Arfaz',
+    name: nonStrikerName?.trim() || 'Non-Striker 2',
     runs: 0,
     balls: 0,
     fours: 0,
@@ -126,7 +151,7 @@ export default function AddScoreScreen({
   });
 
   const [bowler, setBowler] = useState<BowlerStats>({
-    name: 'Rafah',
+    name: initialBowlerName,
     oversCompleted: 0,
     currentOverBalls: 0,
     maidens: 0,
@@ -135,6 +160,98 @@ export default function AddScoreScreen({
   });
 
   const [dismissedBatters, setDismissedBatters] = useState<BatterStats[]>([]);
+
+  // Fetch real team players and populate real squad
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSquads() {
+      try {
+        const teams = await getTeams();
+        if (!isMounted || !Array.isArray(teams)) return;
+
+        // Match fielding team by id or name
+        const targetFieldingTeam = teams.find(
+          (t) =>
+            (fieldingTeamId && String(t.id) === String(fieldingTeamId)) ||
+            (team2Id && String(t.id) === String(team2Id)) ||
+            t.name.trim().toLowerCase() === bowlingTeamName.trim().toLowerCase()
+        );
+
+        // Match batting team by id or name
+        const targetBattingTeam = teams.find(
+          (t) =>
+            (battingTeamId && String(t.id) === String(battingTeamId)) ||
+            (team1Id && String(t.id) === String(team1Id)) ||
+            t.name.trim().toLowerCase() === battingTeamName.trim().toLowerCase()
+        );
+
+        if (targetBattingTeam && Array.isArray(targetBattingTeam.players)) {
+          const bNames = targetBattingTeam.players.map((p) => p.name);
+          setRealBattingPlayerNames(bNames);
+
+          if (!strikerName && targetBattingTeam.players[0]?.name) {
+            setStriker((prev) =>
+              prev.balls === 0 && prev.runs === 0
+                ? { ...prev, name: targetBattingTeam.players[0].name }
+                : prev
+            );
+          }
+          if (!nonStrikerName && targetBattingTeam.players[1]?.name) {
+            setNonStriker((prev) =>
+              prev.balls === 0 && prev.runs === 0
+                ? { ...prev, name: targetBattingTeam.players[1].name }
+                : prev
+            );
+          }
+        }
+
+        if (targetFieldingTeam && Array.isArray(targetFieldingTeam.players)) {
+          const fSquad: SquadPlayerItem[] = targetFieldingTeam.players.map((p) => ({
+            id: String(p.id),
+            name: p.name,
+            role: p.role || (p.bowlingStyle ? `${p.bowlingStyle} Bowler` : 'Bowler'),
+          }));
+          setRealFieldingSquad(fSquad);
+
+          if (!bowlerName && fSquad.length > 0) {
+            const firstBowler = fSquad[0];
+            setBowler((prev) =>
+              prev.oversCompleted === 0 && prev.runsConceded === 0 && prev.currentOverBalls === 0
+                ? { ...prev, name: firstBowler.name }
+                : prev
+            );
+            setBowlerRecords((prev) => ({
+              ...prev,
+              [firstBowler.name]: prev[firstBowler.name] || {
+                name: firstBowler.name,
+                oversCompleted: 0,
+                maidens: 0,
+                runsConceded: 0,
+                wickets: 0,
+              },
+            }));
+          }
+        }
+      } catch (err) {
+        console.log('Error loading squads in AddScoreScreen:', err);
+      }
+    }
+
+    loadSquads();
+    return () => {
+      isMounted = false;
+    };
+  }, [
+    fieldingTeamId,
+    team2Id,
+    bowlingTeamName,
+    battingTeamId,
+    team1Id,
+    battingTeamName,
+    strikerName,
+    nonStrikerName,
+    bowlerName,
+  ]);
 
   // 3. Over Deliveries & History
   const [currentOverDeliveries, setCurrentOverDeliveries] = useState<Delivery[]>([]);
@@ -188,37 +305,36 @@ export default function AddScoreScreen({
     [matchId]
   );
 
-  // Fielding squad for bowling team
+  // Fielding squad for bowling team derived from real team players
   const fieldingSquad: SquadPlayerItem[] = useMemo(() => {
-    const defaultList: SquadPlayerItem[] = [
-      { id: 'b1', name: 'Rafah', role: 'Fast Bowler' },
-      { id: 'b2', name: 'Tanveer Ali', role: 'Fast-Medium' },
-      { id: 'b3', name: 'Zeeshan Khan', role: 'Spin Bowler' },
-      { id: 'b4', name: 'Imran Malik', role: 'Off-Spinner' },
-      { id: 'b5', name: 'Shahid Afridi Jr', role: 'All-Rounder' },
-      { id: 'b6', name: 'Bilal Ahmed', role: 'Medium Pacer' },
-      { id: 'b7', name: 'Farhan Qureshi', role: 'Leg-Spinner' },
-      { id: 'b8', name: 'Danish Ali', role: 'Wicket Keeper' },
-    ];
-    const existingNames = new Set(defaultList.map((p) => p.name.toLowerCase()));
+    const list: SquadPlayerItem[] = [...realFieldingSquad];
+    const existingNames = new Set(list.map((p) => p.name.trim().toLowerCase()));
+
+    // Include bowler records if scorer added or used custom bowlers
     Object.keys(bowlerRecords).forEach((name) => {
-      if (!existingNames.has(name.toLowerCase())) {
-        defaultList.push({
-          id: `custom-${name}`,
-          name,
+      const trimmed = name.trim();
+      if (trimmed && !existingNames.has(trimmed.toLowerCase())) {
+        list.push({
+          id: `bowler-${trimmed}`,
+          name: trimmed,
           role: 'Bowler',
         });
-        existingNames.add(name.toLowerCase());
+        existingNames.add(trimmed.toLowerCase());
       }
     });
-    return defaultList;
-  }, [bowlerRecords]);
+
+    return list;
+  }, [realFieldingSquad, bowlerRecords]);
 
   // Batting players (cannot be selected as bowler)
-  const battingPlayerNames = useMemo(
-    () => [striker.name, nonStriker.name, ...dismissedBatters.map((b) => b.name)],
-    [striker.name, nonStriker.name, dismissedBatters]
-  );
+  const battingPlayerNames = useMemo(() => {
+    const names = new Set<string>();
+    if (striker.name) names.add(striker.name.trim().toLowerCase());
+    if (nonStriker.name) names.add(nonStriker.name.trim().toLowerCase());
+    dismissedBatters.forEach((b) => names.add(b.name.trim().toLowerCase()));
+    realBattingPlayerNames.forEach((pName) => names.add(pName.trim().toLowerCase()));
+    return Array.from(names);
+  }, [striker.name, nonStriker.name, dismissedBatters, realBattingPlayerNames]);
 
   // Preceding bowler restriction: strictly identifies the bowler who bowled the immediately preceding completed over
   const precedingBowlerName = useMemo(() => {
@@ -385,6 +501,14 @@ export default function AddScoreScreen({
     syncScoreToBackend(newTotalRuns, newOversFloat, newTotalWickets);
     triggerSyncedToast();
 
+    // Check if target reached early
+    if (targetRuns && newTotalRuns >= parseInt(targetRuns, 10)) {
+      Alert.alert(
+        'Match Finished!',
+        `Target of ${targetRuns} reached! ${battingTeamName} scored ${newTotalRuns} and won the match!`
+      );
+    }
+
     // Check if legal deliveries have completed the over
     if (newCurrentBalls === ballsPerOver) {
       // Automatically show Over Complete sheet
@@ -520,6 +644,16 @@ export default function AddScoreScreen({
     };
     setAllCompletedOvers((prev) => [...prev, overSummary]);
 
+    // Check if match overs have been completed (innings complete)
+    if (completedOvers + 1 >= totalMatchOvers) {
+      setOverCompleteVisible(false);
+      Alert.alert(
+        'Innings Complete',
+        `All ${totalMatchOvers} overs completed for this innings.\nFinal Score: ${totalRuns}/${totalWickets}`
+      );
+      return;
+    }
+
     // 4. Close over complete sheet and open Select Bowler modal for the next over
     setOverCompleteVisible(false);
     setIsChangingCurrentBowler(false);
@@ -604,55 +738,103 @@ export default function AddScoreScreen({
       case 'rules':
         Alert.alert(
           'Match Rules & Conditions',
-          `• Total Match Overs: ${totalMatchOvers}\n• Balls Per Over: ${ballsPerOver}\n• Max Overs Per Bowler: ${maxOversPerBowler} ov\n• Ball Type: Leather\n• Pitch: Turf\n• Alternating bowlers enforced per over.\n• Preceding over's bowler cannot bowl consecutive overs.`
+          `• Total Match Overs: ${totalMatchOvers}\n• Balls Per Over: ${ballsPerOver} legal deliveries\n• Max Overs Per Bowler: ${maxOversPerBowler} ov\n• Alternating bowlers enforced per over.\n• Preceding over's bowler cannot bowl consecutive overs.`
         );
         break;
       case 'scorer':
-        Alert.alert('Change Scorer', 'Official Scorer: Arfaz Mohammad (Verified Official)');
+        Alert.alert('Change Scorer', 'Official Scorer: Match Day Verified Scorer');
         break;
       case 'squad':
         Alert.alert(
           'Team Squads',
-          `${battingTeamName}: ${striker.name}, ${nonStriker.name}, +9 players\n\n${bowlingTeamName}: ${bowler.name}, +10 fielders`
+          `${battingTeamName}: ${striker.name}, ${nonStriker.name}${
+            realBattingPlayerNames.length > 0 ? ` (+${realBattingPlayerNames.length} squad)` : ''
+          }\n\n${bowlingTeamName}: ${bowler.name}${
+            fieldingSquad.length > 0 ? ` (+${fieldingSquad.length} squad)` : ''
+          }`
         );
         break;
       case 'scorecard':
         setScorecardVisible(true);
         break;
       case 'overs':
-        Alert.alert('Match Overs', `Current match format: ${totalMatchOvers} overs per innings.`, [
-          {
-            text: '5 Overs',
-            onPress: () => {
-              const newOvers = 5;
-              const newQuota = Math.max(1, Math.ceil(newOvers / 5));
-              setTotalMatchOvers(newOvers);
-              setMaxOversPerBowler(newQuota);
-              Alert.alert('Overs Updated', `Match overs set to 5. Bowler quota updated to ${newQuota} ${newQuota === 1 ? 'over' : 'overs'} per bowler.`);
+        Alert.alert(
+          'Match Overs & Balls',
+          `Current settings: ${totalMatchOvers} overs • ${ballsPerOver} balls/over`,
+          [
+            {
+              text: 'Set Balls/Over (3, 4, 6, 8)',
+              onPress: () => {
+                Alert.alert(
+                  'Balls Per Over',
+                  `Current: ${ballsPerOver} legal balls per over`,
+                  [
+                    {
+                      text: '3 Balls',
+                      onPress: () => {
+                        setBallsPerOver(3);
+                        Alert.alert('Balls/Over Updated', 'Over will complete after 3 legal deliveries.');
+                      },
+                    },
+                    {
+                      text: '4 Balls',
+                      onPress: () => {
+                        setBallsPerOver(4);
+                        Alert.alert('Balls/Over Updated', 'Over will complete after 4 legal deliveries.');
+                      },
+                    },
+                    {
+                      text: '6 Balls (Standard)',
+                      onPress: () => {
+                        setBallsPerOver(6);
+                        Alert.alert('Balls/Over Updated', 'Over will complete after 6 legal deliveries.');
+                      },
+                    },
+                    {
+                      text: '8 Balls',
+                      onPress: () => {
+                        setBallsPerOver(8);
+                        Alert.alert('Balls/Over Updated', 'Over will complete after 8 legal deliveries.');
+                      },
+                    },
+                    { text: 'Cancel', style: 'cancel' },
+                  ]
+                );
+              },
             },
-          },
-          {
-            text: '10 Overs',
-            onPress: () => {
-              const newOvers = 10;
-              const newQuota = Math.max(1, Math.ceil(newOvers / 5));
-              setTotalMatchOvers(newOvers);
-              setMaxOversPerBowler(newQuota);
-              Alert.alert('Overs Updated', `Match overs set to 10. Bowler quota updated to ${newQuota} overs per bowler.`);
+            {
+              text: '5 Overs',
+              onPress: () => {
+                const newOvers = 5;
+                const newQuota = Math.max(1, Math.ceil(newOvers / 5));
+                setTotalMatchOvers(newOvers);
+                setMaxOversPerBowler(newQuota);
+                Alert.alert('Overs Updated', `Match overs set to 5. Bowler quota updated to ${newQuota} over per bowler.`);
+              },
             },
-          },
-          {
-            text: '20 Overs (T20)',
-            onPress: () => {
-              const newOvers = 20;
-              const newQuota = Math.max(1, Math.ceil(newOvers / 5));
-              setTotalMatchOvers(newOvers);
-              setMaxOversPerBowler(newQuota);
-              Alert.alert('Overs Updated', `Match overs set to 20. Bowler quota updated to ${newQuota} overs per bowler.`);
+            {
+              text: '10 Overs',
+              onPress: () => {
+                const newOvers = 10;
+                const newQuota = Math.max(1, Math.ceil(newOvers / 5));
+                setTotalMatchOvers(newOvers);
+                setMaxOversPerBowler(newQuota);
+                Alert.alert('Overs Updated', `Match overs set to 10. Bowler quota updated to ${newQuota} overs per bowler.`);
+              },
             },
-          },
-          { text: 'Cancel', style: 'cancel' },
-        ]);
+            {
+              text: '20 Overs (T20)',
+              onPress: () => {
+                const newOvers = 20;
+                const newQuota = Math.max(1, Math.ceil(newOvers / 5));
+                setTotalMatchOvers(newOvers);
+                setMaxOversPerBowler(newQuota);
+                Alert.alert('Overs Updated', `Match overs set to 20. Bowler quota updated to ${newQuota} overs per bowler.`);
+              },
+            },
+            { text: 'Cancel', style: 'cancel' },
+          ]
+        );
         break;
       case 'batters':
         // Swap active striker and non-striker
@@ -1123,6 +1305,7 @@ export default function AddScoreScreen({
         wicketsInOver={wicketsInCurrentOver}
         extrasInOver={extrasInCurrentOver}
         deliveries={currentOverDeliveries}
+        ballsPerOver={ballsPerOver}
         onStartNextOver={handleStartNextOver}
         onContinueThisOver={handleContinueThisOver}
         onOpenSettings={() => handleSelectShortcut('rules')}
@@ -1162,6 +1345,7 @@ export default function AddScoreScreen({
         totalWickets={totalWickets}
         completedOvers={completedOvers}
         currentOverBalls={currentOverBalls}
+        ballsPerOver={ballsPerOver}
         totalOvers={totalMatchOvers}
         striker={striker}
         nonStriker={nonStriker}

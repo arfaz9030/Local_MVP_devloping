@@ -11,6 +11,19 @@ type MatchDetailRouteParams = {
   wickets?: string;
   overs?: string;
   status?: string;
+  ballsPerOver?: string;
+  totalOvers?: string;
+  oversPerBowler?: string;
+  team1Id?: string;
+  team2Id?: string;
+  battingTeamId?: string;
+  fieldingTeamId?: string;
+  battingTeamName?: string;
+  fieldingTeamName?: string;
+  strikerName?: string;
+  nonStrikerName?: string;
+  bowlerName?: string;
+  targetRuns?: string;
 };
 
 export default function MatchDetailScreen() {
@@ -74,6 +87,19 @@ export default function MatchDetailScreen() {
         wickets: String(match.wickets),
         overs: String(match.overs),
         status: match.status,
+        ballsPerOver: params.ballsPerOver,
+        totalOvers: params.totalOvers,
+        oversPerBowler: params.oversPerBowler,
+        team1Id: params.team1Id,
+        team2Id: params.team2Id,
+        battingTeamId: params.battingTeamId,
+        fieldingTeamId: params.fieldingTeamId,
+        battingTeamName: params.battingTeamName,
+        fieldingTeamName: params.fieldingTeamName,
+        strikerName: params.strikerName,
+        nonStrikerName: params.nonStrikerName,
+        bowlerName: params.bowlerName,
+        targetRuns: params.targetRuns,
       },
     });
   };

@@ -100,6 +100,8 @@ Complete Teams + Players Module (frontend and backend integration).
   - Screen 4: Over Completion Bottom Sheet (`OverCompleteSheet.tsx`) triggered strictly on 6 legal deliveries, displaying runs, overs, wickets, extras, color-coded ball sequence, and actions for Start Next Over and Continue This Over
   - Full Innings Scorecard Modal (`FullScorecardModal.tsx`) with detailed batting scorecard, bowling analysis, and extras breakdown
   - Design system tokens: Added semantic cricket scoring tokens (`boundaryFour`, `boundarySix`, `ballWicket`, `ballWide`, `keypadBg`, `keypadBorder`, `keypadText`, `overlayDark`, `hero`, `xxl`) to centralized theme without hardcoding
+  - [x] Dynamic Ball Count Fix: Overs complete strictly according to configured legal deliveries (3, 4, 6, 8 balls per over); configurable in CreateMatchScreen, forwarded via router params, dynamically counted in scoring engine, and updated in OverCompleteSheet and FullScorecardModal run-rate/economy formulas
+  - [x] Real Team Squad Bowlers Integration: Bowler selection dynamically populates from fielding team squad via `getTeams()`; all batting team players excluded from bowling; empty squad state instructs user to add players or enter custom bowler; hardcoded dummy names completely removed
 
 ### In Progress
 

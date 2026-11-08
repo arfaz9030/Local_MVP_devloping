@@ -13,6 +13,16 @@ export default function AddScoreRoute() {
     totalOvers?: string;
     oversPerBowler?: string;
     ballsPerOver?: string;
+    team1Id?: string;
+    team2Id?: string;
+    battingTeamId?: string;
+    fieldingTeamId?: string;
+    battingTeamName?: string;
+    fieldingTeamName?: string;
+    strikerName?: string;
+    nonStrikerName?: string;
+    bowlerName?: string;
+    targetRuns?: string;
   }>();
 
   return (
@@ -27,6 +37,16 @@ export default function AddScoreRoute() {
       totalOvers={params.totalOvers}
       oversPerBowler={params.oversPerBowler}
       ballsPerOver={params.ballsPerOver}
+      team1Id={params.team1Id}
+      team2Id={params.team2Id}
+      battingTeamId={params.battingTeamId}
+      fieldingTeamId={params.fieldingTeamId}
+      battingTeamName={params.battingTeamName}
+      fieldingTeamName={params.fieldingTeamName}
+      strikerName={params.strikerName}
+      nonStrikerName={params.nonStrikerName}
+      bowlerName={params.bowlerName}
+      targetRuns={params.targetRuns}
     />
   );
 }
