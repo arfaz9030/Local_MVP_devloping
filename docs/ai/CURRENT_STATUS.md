@@ -496,21 +496,17 @@ Matches
 
 ░░░░░░░░░░ 0%
 
-Live Scoring
+Live Scoring (Frontend)
 
-░░░░░░░░░░ 0%
+██████████ 100% (Ball-by-ball, shortcuts, over complete, consecutive bowler validation, quota limits)
 
 Scoreboard
 
-░░░░░░░░░░ 0%
-
-Summary
-
-░░░░░░░░░░ 0%
+████████░░ 80% (Scorecard modal, innings summary)
 
 Overall MVP
 
-███░░░░░░░ 35%
+██████░░░░ 60%
 
 ---
 

@@ -62,6 +62,14 @@ export interface OverSummary {
   extras: number;
 }
 
+export interface BowlerRecord {
+  name: string;
+  oversCompleted: number;
+  maidens: number;
+  runsConceded: number;
+  wickets: number;
+}
+
 export interface ScoringStateSnapshot {
   totalRuns: number;
   totalWickets: number;
@@ -72,6 +80,9 @@ export interface ScoringStateSnapshot {
   bowler: BowlerStats;
   currentOverDeliveries: Delivery[];
   allCompletedOvers: OverSummary[];
+  bowlerRecords: Record<string, BowlerRecord>;
+  maxOversPerBowler: number;
+  ballsPerOver: number;
   extrasBreakdown: {
     wides: number;
     noBalls: number;
