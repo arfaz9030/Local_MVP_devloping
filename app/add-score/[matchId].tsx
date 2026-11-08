@@ -10,6 +10,9 @@ export default function AddScoreRoute() {
     wickets?: string;
     overs?: string;
     status?: string;
+    totalOvers?: string;
+    oversPerBowler?: string;
+    ballsPerOver?: string;
   }>();
 
   return (
@@ -21,6 +24,9 @@ export default function AddScoreRoute() {
       wickets={params.wickets ?? ''}
       overs={params.overs ?? ''}
       status={params.status ?? ''}
+      totalOvers={params.totalOvers}
+      oversPerBowler={params.oversPerBowler}
+      ballsPerOver={params.ballsPerOver}
     />
   );
 }

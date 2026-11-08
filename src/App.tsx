@@ -49,6 +49,17 @@ export default function App() {
   const [nonStrikerRuns, setNonStrikerRuns] = useState(7);
   const [nonStrikerBalls, setNonStrikerBalls] = useState(3);
   const [bowlerFigures, setBowlerFigures] = useState({ overs: '0.4', maidens: '0', runs: '15', wickets: '0' });
+  const [activeBowler, setActiveBowler] = useState('Rafah');
+  const [precedingBowler, setPrecedingBowler] = useState<string | null>(null);
+  const [maxOversPerBowler, setMaxOversPerBowler] = useState(2);
+  const [bowlerRecords, setBowlerRecords] = useState<Record<string, { overs: number; runs: number; wickets: number }>>({
+    Rafah: { overs: 0, runs: 15, wickets: 0 },
+    'Tanveer Ali': { overs: 0, runs: 0, wickets: 0 },
+    'Zeeshan Khan': { overs: 0, runs: 0, wickets: 0 },
+    'Imran Malik': { overs: 0, runs: 0, wickets: 0 },
+    'Shahid Afridi Jr': { overs: 0, runs: 0, wickets: 0 },
+  });
+  const [isSelectBowlerOpen, setIsSelectBowlerOpen] = useState(false);
   const [history, setHistory] = useState<any[]>([]);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isOverCompleteOpen, setIsOverCompleteOpen] = useState(false);
@@ -170,14 +181,38 @@ export default function App() {
 
   const handleNextOver = () => {
     if (!activeScoringMatch) return;
+    // Update active bowler record
+    setBowlerRecords((prev) => ({
+      ...prev,
+      [activeBowler]: {
+        ...(prev[activeBowler] || { runs: 0, wickets: 0 }),
+        overs: (prev[activeBowler]?.overs || 0) + 1,
+      },
+    }));
+    setPrecedingBowler(activeBowler);
+    setIsOverCompleteOpen(false);
+    setIsSelectBowlerOpen(true);
+  };
+
+  const handleSelectNextBowler = (name: string) => {
+    if (!activeScoringMatch) return;
+    if (name === precedingBowler) {
+      alert(`${name} bowled the immediately preceding over and cannot bowl consecutive overs.`);
+      return;
+    }
+    const bowled = bowlerRecords[name]?.overs || 0;
+    if (bowled >= maxOversPerBowler) {
+      alert(`${name} has completed their maximum bowling quota of ${maxOversPerBowler} overs.`);
+      return;
+    }
     const completedOvers = Math.floor(activeScoringMatch.overs) + 1;
-    const updated = {
+    setActiveScoringMatch({
       ...activeScoringMatch,
       overs: completedOvers,
-    };
-    setActiveScoringMatch(updated);
+    });
+    setActiveBowler(name);
     setCurrentBalls([]);
-    setIsOverCompleteOpen(false);
+    setIsSelectBowlerOpen(false);
     triggerSyncToast();
   };
 
@@ -327,12 +362,25 @@ export default function App() {
             <div className="mx-4 mt-2.5 bg-[#111C34] border border-[#1E293B] rounded-xl px-3.5 py-2.5 flex items-center justify-between text-xs font-bold">
               <div className="flex items-center gap-2">
                 <span>🔴</span>
-                <span className="text-white">Rafah</span>
+                <span className="text-white">{activeBowler}</span>
                 <span className="text-[#5EEAD4] font-mono tracking-tighter">|||</span>
+                {currentBalls.length === 0 && (
+                  <button
+                    onClick={() => setIsSelectBowlerOpen(true)}
+                    className="ml-2 text-[10px] bg-[#007F78]/30 hover:bg-[#007F78]/50 text-[#5EEAD4] px-1.5 py-0.5 rounded cursor-pointer"
+                  >
+                    Change
+                  </button>
+                )}
               </div>
-              <span className="font-mono text-slate-300">
-                {bowlerFigures.overs}-{bowlerFigures.maidens}-{bowlerFigures.runs}-{bowlerFigures.wickets}
-              </span>
+              <div className="text-right">
+                <span className="font-mono text-slate-300">
+                  {bowlerFigures.overs}-{bowlerFigures.maidens}-{bowlerFigures.runs}-{bowlerFigures.wickets}
+                </span>
+                <div className="text-[10px] text-slate-400 font-normal">
+                  Quota: {bowlerRecords[activeBowler]?.overs || 0}/{maxOversPerBowler} ov
+                </div>
+              </div>
             </div>
 
             {/* Ball Sequence */}
@@ -513,6 +561,83 @@ export default function App() {
                   >
                     Continue this over
                   </button>
+                </div>
+              </div>
+            )}
+
+            {/* Select Bowler Sheet (Consecutive Bowler & Quota Enforcement) */}
+            {isSelectBowlerOpen && (
+              <div className="absolute inset-0 bg-black/75 flex flex-col justify-end z-50 p-4">
+                <div className="bg-white text-slate-900 rounded-3xl p-5 shadow-2xl max-h-[85%] flex flex-col">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Select Bowler</h3>
+                      <p className="text-[11px] text-slate-500">
+                        Max Quota: {maxOversPerBowler} {maxOversPerBowler === 1 ? 'over' : 'overs'} per bowler
+                      </p>
+                    </div>
+                    {currentBalls.length === 0 && (
+                      <button
+                        onClick={() => setIsSelectBowlerOpen(false)}
+                        className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                      >
+                        <X size={18} />
+                      </button>
+                    )}
+                  </div>
+
+                  {precedingBowler && (
+                    <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-2 rounded-xl mb-3 flex items-center gap-2">
+                      <AlertCircle size={15} className="text-amber-600 shrink-0" />
+                      <span>
+                        <strong>{precedingBowler}</strong> bowled the previous over and cannot bowl consecutive overs.
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="space-y-2 overflow-y-auto max-h-60 pr-1">
+                    {['Rafah', 'Tanveer Ali', 'Zeeshan Khan', 'Imran Malik', 'Shahid Afridi Jr'].map((name) => {
+                      const isConsecutive = name === precedingBowler;
+                      const oversBowled = bowlerRecords[name]?.overs || 0;
+                      const isQuotaFull = oversBowled >= maxOversPerBowler;
+                      const isEligible = !isConsecutive && !isQuotaFull;
+
+                      return (
+                        <div
+                          key={name}
+                          className={`flex items-center justify-between p-3 rounded-xl border ${
+                            isEligible
+                              ? 'border-slate-200 bg-slate-50 hover:border-[#007F78]'
+                              : 'border-slate-100 bg-slate-100 opacity-60'
+                          }`}
+                        >
+                          <div>
+                            <div className="font-bold text-xs text-slate-900">{name}</div>
+                            <div className="text-[10px] text-slate-500">
+                              Overs: {oversBowled}/{maxOversPerBowler} ov
+                            </div>
+                          </div>
+
+                          {isConsecutive ? (
+                            <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
+                              Consecutive
+                            </span>
+                          ) : isQuotaFull ? (
+                            <span className="text-[10px] font-bold bg-red-100 text-red-800 px-2 py-0.5 rounded">
+                              Quota Full
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => handleSelectNextBowler(name)}
+                              className="px-3 py-1 bg-[#007F78] hover:bg-[#005F5A] text-white text-xs font-bold rounded-lg cursor-pointer"
+                            >
+                              Select
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}

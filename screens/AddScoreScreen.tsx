@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Clipboard,
@@ -20,8 +20,10 @@ import { ExtraRunsModal } from '../components/scoring/ExtraRunsModal';
 import { FullScorecardModal } from '../components/scoring/FullScorecardModal';
 import { OverCompleteSheet } from '../components/scoring/OverCompleteSheet';
 import { ScoringShortcutsSheet, ShortcutAction } from '../components/scoring/ScoringShortcutsSheet';
+import { SelectBowlerModal, SquadPlayerItem } from '../components/scoring/SelectBowlerModal';
 import {
   BatterStats,
+  BowlerRecord,
   BowlerStats,
   Delivery,
   DismissalType,
@@ -44,6 +46,8 @@ type AddScoreProps = {
   overs?: string;
   status?: string;
   totalOvers?: string;
+  oversPerBowler?: string;
+  ballsPerOver?: string;
 };
 
 export default function AddScoreScreen({
@@ -55,6 +59,8 @@ export default function AddScoreScreen({
   overs = '0.0',
   status = 'LIVE',
   totalOvers = '5',
+  oversPerBowler,
+  ballsPerOver: initialBallsPerOver = '6',
 }: AddScoreProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -67,6 +73,9 @@ export default function AddScoreScreen({
   const battingTeamName = team1Name || 'Hero';
   const bowlingTeamName = team2Name || 'Opponents';
   const matchMaxOvers = parseInt(totalOvers, 10) || 5;
+  const configuredBallsPerOver = parseInt(initialBallsPerOver, 10) || 6;
+  const configuredOversPerBowler =
+    parseInt(oversPerBowler || '', 10) || Math.max(1, Math.ceil(matchMaxOvers / 5));
 
   // Initial runs and overs calculation
   const parsedRuns = parseInt(runs, 10) || 0;
@@ -81,6 +90,21 @@ export default function AddScoreScreen({
   const [completedOvers, setCompletedOvers] = useState<number>(initialCompletedOvers);
   const [currentOverBalls, setCurrentOverBalls] = useState<number>(initialCurrentBalls);
   const [totalMatchOvers, setTotalMatchOvers] = useState<number>(matchMaxOvers);
+  const [ballsPerOver, setBallsPerOver] = useState<number>(configuredBallsPerOver);
+  const [maxOversPerBowler, setMaxOversPerBowler] = useState<number>(configuredOversPerBowler);
+
+  // Cumulative bowler stats across match
+  const [bowlerRecords, setBowlerRecords] = useState<Record<string, BowlerRecord>>({
+    Rafah: {
+      name: 'Rafah',
+      oversCompleted: 0,
+      maidens: 0,
+      runsConceded: 0,
+      wickets: 0,
+    },
+  });
+  const [selectBowlerModalVisible, setSelectBowlerModalVisible] = useState(false);
+  const [isChangingCurrentBowler, setIsChangingCurrentBowler] = useState(false);
 
   // 2. Batters & Bowler State
   const [striker, setStriker] = useState<BatterStats>({
@@ -164,6 +188,44 @@ export default function AddScoreScreen({
     [matchId]
   );
 
+  // Fielding squad for bowling team
+  const fieldingSquad: SquadPlayerItem[] = useMemo(() => {
+    const defaultList: SquadPlayerItem[] = [
+      { id: 'b1', name: 'Rafah', role: 'Fast Bowler' },
+      { id: 'b2', name: 'Tanveer Ali', role: 'Fast-Medium' },
+      { id: 'b3', name: 'Zeeshan Khan', role: 'Spin Bowler' },
+      { id: 'b4', name: 'Imran Malik', role: 'Off-Spinner' },
+      { id: 'b5', name: 'Shahid Afridi Jr', role: 'All-Rounder' },
+      { id: 'b6', name: 'Bilal Ahmed', role: 'Medium Pacer' },
+      { id: 'b7', name: 'Farhan Qureshi', role: 'Leg-Spinner' },
+      { id: 'b8', name: 'Danish Ali', role: 'Wicket Keeper' },
+    ];
+    const existingNames = new Set(defaultList.map((p) => p.name.toLowerCase()));
+    Object.keys(bowlerRecords).forEach((name) => {
+      if (!existingNames.has(name.toLowerCase())) {
+        defaultList.push({
+          id: `custom-${name}`,
+          name,
+          role: 'Bowler',
+        });
+        existingNames.add(name.toLowerCase());
+      }
+    });
+    return defaultList;
+  }, [bowlerRecords]);
+
+  // Batting players (cannot be selected as bowler)
+  const battingPlayerNames = useMemo(
+    () => [striker.name, nonStriker.name, ...dismissedBatters.map((b) => b.name)],
+    [striker.name, nonStriker.name, dismissedBatters]
+  );
+
+  // Preceding bowler restriction: strictly identifies the bowler who bowled the immediately preceding completed over
+  const precedingBowlerName = useMemo(() => {
+    if (allCompletedOvers.length === 0) return null;
+    return allCompletedOvers[allCompletedOvers.length - 1]?.bowlerName || null;
+  }, [allCompletedOvers]);
+
   // Take snapshot before modifying state for full reversible UNDO
   const pushSnapshot = () => {
     const snapshot: ScoringStateSnapshot = {
@@ -176,6 +238,9 @@ export default function AddScoreScreen({
       bowler: { ...bowler },
       currentOverDeliveries: [...currentOverDeliveries],
       allCompletedOvers: [...allCompletedOvers],
+      bowlerRecords: { ...bowlerRecords },
+      maxOversPerBowler,
+      ballsPerOver,
       extrasBreakdown: { ...extrasBreakdown },
     };
     setHistoryStack((prev) => [...prev, snapshot]);
@@ -200,10 +265,22 @@ export default function AddScoreScreen({
     setBowler(previousSnapshot.bowler);
     setCurrentOverDeliveries(previousSnapshot.currentOverDeliveries);
     setAllCompletedOvers(previousSnapshot.allCompletedOvers);
+    if (previousSnapshot.bowlerRecords) {
+      setBowlerRecords(previousSnapshot.bowlerRecords);
+    }
+    if (previousSnapshot.maxOversPerBowler) {
+      setMaxOversPerBowler(previousSnapshot.maxOversPerBowler);
+    }
+    if (previousSnapshot.ballsPerOver) {
+      setBallsPerOver(previousSnapshot.ballsPerOver);
+    }
     setExtrasBreakdown(previousSnapshot.extrasBreakdown);
 
     if (overCompleteVisible) {
       setOverCompleteVisible(false);
+    }
+    if (selectBowlerModalVisible) {
+      setSelectBowlerModalVisible(false);
     }
 
     const newOversFloat = parseFloat(
@@ -253,7 +330,7 @@ export default function AddScoreScreen({
     updatedBowler.runsConceded += runsToAdd;
     if (isLegal) {
       updatedBowler.currentOverBalls += 1;
-      if (updatedBowler.currentOverBalls === 6) {
+      if (updatedBowler.currentOverBalls === ballsPerOver) {
         updatedBowler.oversCompleted += 1;
         updatedBowler.currentOverBalls = 0;
       }
@@ -308,8 +385,8 @@ export default function AddScoreScreen({
     syncScoreToBackend(newTotalRuns, newOversFloat, newTotalWickets);
     triggerSyncedToast();
 
-    // Check if 6 legal deliveries have been bowled
-    if (newCurrentBalls === 6) {
+    // Check if legal deliveries have completed the over
+    if (newCurrentBalls === ballsPerOver) {
       // Automatically show Over Complete sheet
       setOverCompleteVisible(true);
     }
@@ -351,7 +428,7 @@ export default function AddScoreScreen({
       updatedBowler.wickets += 1;
     }
     updatedBowler.currentOverBalls += 1;
-    if (updatedBowler.currentOverBalls === 6) {
+    if (updatedBowler.currentOverBalls === ballsPerOver) {
       updatedBowler.oversCompleted += 1;
       updatedBowler.currentOverBalls = 0;
     }
@@ -399,25 +476,85 @@ export default function AddScoreScreen({
     syncScoreToBackend(totalRuns, newOversFloat, newTotalWickets);
     triggerSyncedToast();
 
-    if (newCurrentBalls === 6) {
+    if (newCurrentBalls === ballsPerOver) {
       setOverCompleteVisible(true);
     }
   };
 
-  // Over complete sheet actions
+  // Over complete sheet actions: Archives over, updates bowler figures, and triggers next bowler selection
   const handleStartNextOver = () => {
-    // 1. Archive completed over
+    // 1. Calculate figures for completed over
+    const runsInThisOver = currentOverDeliveries.reduce((acc, d) => acc + d.runs + d.extras, 0);
+    const wicketsInThisOver = currentOverDeliveries.filter((d) => d.type === 'WICKET').length;
+    const extrasInThisOver = currentOverDeliveries.reduce((acc, d) => acc + d.extras, 0);
+    const isMaiden = runsInThisOver === 0;
+
+    // 2. Update cumulative record for the bowler who just finished this over
+    const prevRecord = bowlerRecords[bowler.name] || {
+      name: bowler.name,
+      oversCompleted: 0,
+      maidens: 0,
+      runsConceded: 0,
+      wickets: 0,
+    };
+    const updatedRecord: BowlerRecord = {
+      ...prevRecord,
+      oversCompleted: prevRecord.oversCompleted + 1,
+      maidens: prevRecord.maidens + (isMaiden ? 1 : 0),
+      runsConceded: bowler.runsConceded,
+      wickets: bowler.wickets,
+    };
+    setBowlerRecords((prev) => ({
+      ...prev,
+      [bowler.name]: updatedRecord,
+    }));
+
+    // 3. Save to allCompletedOvers
     const overSummary: OverSummary = {
       overNumber: completedOvers + 1,
       bowlerName: bowler.name,
       deliveries: [...currentOverDeliveries],
-      runs: currentOverDeliveries.reduce((acc, d) => acc + d.runs + d.extras, 0),
-      wickets: currentOverDeliveries.filter((d) => d.type === 'WICKET').length,
-      extras: currentOverDeliveries.reduce((acc, d) => acc + d.extras, 0),
+      runs: runsInThisOver,
+      wickets: wicketsInThisOver,
+      extras: extrasInThisOver,
     };
-
     setAllCompletedOvers((prev) => [...prev, overSummary]);
-    setCompletedOvers((prev) => prev + 1);
+
+    // 4. Close over complete sheet and open Select Bowler modal for the next over
+    setOverCompleteVisible(false);
+    setIsChangingCurrentBowler(false);
+    setSelectBowlerModalVisible(true);
+  };
+
+  // Confirm Bowler selection from SelectBowlerModal
+  const handleConfirmNextBowler = (newBowlerName: string) => {
+    if (isChangingCurrentBowler) {
+      // Scorer tapped "Change" at ball 0 of current over
+      const record = bowlerRecords[newBowlerName] || {
+        name: newBowlerName,
+        oversCompleted: 0,
+        maidens: 0,
+        runsConceded: 0,
+        wickets: 0,
+      };
+      setBowler({
+        name: newBowlerName,
+        oversCompleted: record.oversCompleted,
+        currentOverBalls: 0,
+        maidens: record.maidens,
+        runsConceded: record.runsConceded,
+        wickets: record.wickets,
+      });
+      setSelectBowlerModalVisible(false);
+      setIsChangingCurrentBowler(false);
+      Alert.alert('Bowler Changed', `${newBowlerName} is ready to bowl this over.`);
+      return;
+    }
+
+    // Starting next over
+    // 1. Advance completed overs count
+    const nextCompletedOvers = completedOvers + 1;
+    setCompletedOvers(nextCompletedOvers);
     setCurrentOverBalls(0);
     setCurrentOverDeliveries([]);
 
@@ -426,15 +563,27 @@ export default function AddScoreScreen({
     setStriker(nonStriker);
     setNonStriker(temp);
 
-    // 3. Reset bowler current over balls
-    setBowler((prev) => ({
-      ...prev,
+    // 3. Load figures of the newly selected bowler
+    const record = bowlerRecords[newBowlerName] || {
+      name: newBowlerName,
+      oversCompleted: 0,
+      maidens: 0,
+      runsConceded: 0,
+      wickets: 0,
+    };
+    setBowler({
+      name: newBowlerName,
+      oversCompleted: record.oversCompleted,
       currentOverBalls: 0,
-    }));
+      maidens: record.maidens,
+      runsConceded: record.runsConceded,
+      wickets: record.wickets,
+    });
 
-    setOverCompleteVisible(false);
+    // 4. Close modal and sync
+    setSelectBowlerModalVisible(false);
 
-    const nextOversFloat = parseFloat(`${completedOvers + 1}.0`);
+    const nextOversFloat = parseFloat(`${nextCompletedOvers}.0`);
     syncScoreToBackend(totalRuns, nextOversFloat, totalWickets);
     triggerSyncedToast();
   };
@@ -455,7 +604,7 @@ export default function AddScoreScreen({
       case 'rules':
         Alert.alert(
           'Match Rules & Conditions',
-          `• Total Match Overs: ${totalMatchOvers}\n• Ball Type: Leather\n• Pitch: Turf\n• Powerplay: Overs 1-2\n• Maximum 6 legal deliveries per over.`
+          `• Total Match Overs: ${totalMatchOvers}\n• Balls Per Over: ${ballsPerOver}\n• Max Overs Per Bowler: ${maxOversPerBowler} ov\n• Ball Type: Leather\n• Pitch: Turf\n• Alternating bowlers enforced per over.\n• Preceding over's bowler cannot bowl consecutive overs.`
         );
         break;
       case 'scorer':
@@ -472,9 +621,36 @@ export default function AddScoreScreen({
         break;
       case 'overs':
         Alert.alert('Match Overs', `Current match format: ${totalMatchOvers} overs per innings.`, [
-          { text: '5 Overs', onPress: () => setTotalMatchOvers(5) },
-          { text: '10 Overs', onPress: () => setTotalMatchOvers(10) },
-          { text: '20 Overs (T20)', onPress: () => setTotalMatchOvers(20) },
+          {
+            text: '5 Overs',
+            onPress: () => {
+              const newOvers = 5;
+              const newQuota = Math.max(1, Math.ceil(newOvers / 5));
+              setTotalMatchOvers(newOvers);
+              setMaxOversPerBowler(newQuota);
+              Alert.alert('Overs Updated', `Match overs set to 5. Bowler quota updated to ${newQuota} ${newQuota === 1 ? 'over' : 'overs'} per bowler.`);
+            },
+          },
+          {
+            text: '10 Overs',
+            onPress: () => {
+              const newOvers = 10;
+              const newQuota = Math.max(1, Math.ceil(newOvers / 5));
+              setTotalMatchOvers(newOvers);
+              setMaxOversPerBowler(newQuota);
+              Alert.alert('Overs Updated', `Match overs set to 10. Bowler quota updated to ${newQuota} overs per bowler.`);
+            },
+          },
+          {
+            text: '20 Overs (T20)',
+            onPress: () => {
+              const newOvers = 20;
+              const newQuota = Math.max(1, Math.ceil(newOvers / 5));
+              setTotalMatchOvers(newOvers);
+              setMaxOversPerBowler(newQuota);
+              Alert.alert('Overs Updated', `Match overs set to 20. Bowler quota updated to ${newQuota} overs per bowler.`);
+            },
+          },
           { text: 'Cancel', style: 'cancel' },
         ]);
         break;
@@ -708,7 +884,16 @@ export default function AddScoreScreen({
         {/* 4. CURRENT BOWLER BAR                                             */}
         {/* ================================================================= */}
         <View style={styles.bowlerBar}>
-          <View style={styles.bowlerInfoLeft}>
+          <TouchableOpacity
+            style={styles.bowlerInfoLeft}
+            activeOpacity={currentOverBalls === 0 ? 0.7 : 1}
+            onPress={() => {
+              if (currentOverBalls === 0) {
+                setIsChangingCurrentBowler(true);
+                setSelectBowlerModalVisible(true);
+              }
+            }}
+          >
             <Icon source="cricket" size={20} color={COLORS.textSecondary} />
             <Text style={styles.bowlerNameText} numberOfLines={1}>
               {bowler.name}
@@ -719,13 +904,23 @@ export default function AddScoreScreen({
               <View style={styles.stumpBar} />
               <View style={styles.stumpBar} />
             </View>
-          </View>
+            {currentOverBalls === 0 ? (
+              <View style={styles.changeBowlerPill}>
+                <Text style={styles.changeBowlerText}>Change</Text>
+              </View>
+            ) : null}
+          </TouchableOpacity>
 
-          {/* Bowler Figures (O.B-M-R-W) */}
-          <Text style={styles.bowlerFiguresText}>
-            {bowler.oversCompleted}.{bowler.currentOverBalls}-{bowler.maidens}-
-            {bowler.runsConceded}-{bowler.wickets}
-          </Text>
+          {/* Bowler Figures (O.B-M-R-W) and Quota */}
+          <View style={{ alignItems: 'flex-end' }}>
+            <Text style={styles.bowlerFiguresText}>
+              {bowler.oversCompleted}.{bowler.currentOverBalls}-{bowler.maidens}-
+              {bowler.runsConceded}-{bowler.wickets}
+            </Text>
+            <Text style={styles.bowlerQuotaSubtitle}>
+              Quota: {bowler.oversCompleted}/{maxOversPerBowler} ov
+            </Text>
+          </View>
         </View>
 
         {/* ================================================================= */}
@@ -976,6 +1171,21 @@ export default function AddScoreScreen({
         extrasBreakdown={extrasBreakdown}
         onClose={() => setScorecardVisible(false)}
       />
+
+      {/* Screen: Select Bowler Modal (Consecutive over validation & quota enforcement) */}
+      <SelectBowlerModal
+        visible={selectBowlerModalVisible}
+        overNumber={allCompletedOvers.length + 1}
+        fieldingTeamName={bowlingTeamName}
+        precedingBowlerName={precedingBowlerName}
+        maxOversPerBowler={maxOversPerBowler}
+        bowlerRecords={bowlerRecords}
+        fieldingSquad={fieldingSquad}
+        battingPlayerNames={battingPlayerNames}
+        onSelectBowler={handleConfirmNextBowler}
+        onClose={() => setSelectBowlerModalVisible(false)}
+        canCancel={isChangingCurrentBowler}
+      />
     </View>
   );
 }
@@ -1147,6 +1357,23 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHT.bold,
     color: COLORS.textSecondary,
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+  },
+  bowlerQuotaSubtitle: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  changeBowlerPill: {
+    backgroundColor: 'rgba(0, 168, 132, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginLeft: 6,
+  },
+  changeBowlerText: {
+    fontSize: 10,
+    fontWeight: FONT_WEIGHT.bold,
+    color: COLORS.brandTeal,
   },
   overSequenceContainer: {
     marginTop: 14,
